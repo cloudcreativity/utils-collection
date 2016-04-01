@@ -1,0 +1,38 @@
+{
+    "name": "cloudcreativity/utils-collection",
+    "description": "Our standard class for handling lists in PHP.",
+    "keywords": [
+        "cloudcreativity"
+    ],
+    "homepage": "https://github.com/cloudcreativity/utils-collection",
+    "support": {
+        "issues": "https://github.com/cloudcreativity/utils-collection/issues"
+    },
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "Cloud Creativity Ltd",
+            "email": "info@cloudcreativity.co.uk"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.7"
+    },
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "CloudCreativity\\Utils\\Collection": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CloudCreativity\\Utils\\Collection": "test/"
+        }
+    },
+    "config": {
+        "bin-dir": "bin"
+    }
+}
