@@ -222,6 +222,21 @@ class Collection implements Iterator, Countable
     }
 
     /**
+     * Get a copy (clone) of this collection.
+     *
+     * Copy returns a clone of this collection without cloning the contents
+     * of the collection - i.e. it is a shallow clone.
+     *
+     * To do a deep clone of the collection, use `replicate()`.
+     *
+     * @return Collection
+     */
+    public function copy()
+    {
+        return clone $this;
+    }
+
+    /**
      * How many items are in the collection?
      *
      * @return int
@@ -763,6 +778,18 @@ class Collection implements Iterator, Countable
         $this->stack = $this->cast($items)->toArray();
 
         return $this;
+    }
+
+    /**
+     * Copy the collection, cloning any objects within the collection.
+     *
+     * @return Collection
+     */
+    public function replicate()
+    {
+        return $this->map(function ($item) {
+            return is_object($item) ? clone $item : $item;
+        });
     }
 
     /**
