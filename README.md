@@ -1,1 +1,86 @@
 # cloudcreativity/utils-collection
+
+Our standard collection class for handling lists in PHP. By lists, we mean
+numerically indexed arrays.
+
+This package also contains our `StandardIteratorInterface`. We use this if we
+are writing specific collection classes that hold only particular types of
+objects.
+
+## Collection
+
+The `CloudCreativity\Utils\Collection\Collection` is a standard class for
+handling numerically indexed lists. It comes with the following methods.
+
+### Modifiers
+
+The following methods modify the list contained within the collection:
+
+* `add`
+* `addMany`
+* `addObject`
+* `addObjects`
+* `clear`
+* `insertAt`
+* `pop`
+* `push`
+* `pushMany`
+* `pushObject`
+* `pushObjects`
+* `remove`
+* `removeAt`
+* `removeMany`
+* `replace`
+* `shift`
+* `unshift`
+* `unshiftMany`
+* `unshiftObject`
+* `unshiftObjects`
+
+### Accessors
+
+The following methods give access to items within the collection:
+
+* `first`
+* `find`
+* `itemAt`
+* `last`
+
+### Querying
+
+The following methods can be used to assess or query the contents of the
+collection;
+
+* `any`
+* `contains`
+* `equals`
+* `every`
+* `indexOf`
+* `isEmpty`
+* `search`
+
+### Helpers
+
+The following methods assist with handling the list, and return new instances
+of the collection. (I.e. the original collection is not modified.)
+
+* `cast` (static)
+* `chunk`
+* `compact`
+* `copy`
+* `count`
+* `filter`
+* `invoke`
+* `itemsAt`
+* `map`
+* `pad`
+* `reduce`
+* `reject`
+* `replicate`
+* `reverse`
+* `slice`
+* `sort`
+* `sync`
+* `toArray`
+* `unique`
+* `without`
