@@ -78,7 +78,7 @@ trait StandardIteratorTrait
      */
     public function every(callable $callback)
     {
-        return $this->every($callback);
+        return $this->stack()->every($callback);
     }
 
     /**
@@ -123,6 +123,6 @@ trait StandardIteratorTrait
             $this->stack = new Collection();
         }
 
-        return $this;
+        return $this->stack;
     }
 }

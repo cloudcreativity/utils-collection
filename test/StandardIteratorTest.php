@@ -68,20 +68,20 @@ class StandardIteratorTest extends TestCase
             return is_string($item) && $index < 3;
         }));
 
-        $this->assertFalse($this->iterator->every(function ($item)) {
+        $this->assertFalse($this->iterator->every(function ($item) {
             return in_array($item, ['a', 'b']);
-        });
+        }));
     }
 
     public function testAny()
     {
-        $this->assertTrue($this->iterator->any(function ($item)) {
+        $this->assertTrue($this->iterator->any(function ($item) {
             return 'c' === $item;
-        });
+        }));
 
-        $this->assertFalse($this->iterator->any(function ($item, $index)) {
+        $this->assertFalse($this->iterator->any(function ($item, $index) {
             return 3 < $index;
-        });
+        }));
     }
 
     public function testIsEmpty()

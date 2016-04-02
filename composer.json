@@ -24,12 +24,12 @@
     "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
-            "CloudCreativity\\Utils\\Collection": "src/"
+            "CloudCreativity\\Utils\\Collection\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "CloudCreativity\\Utils\\Collection": "test/"
+            "CloudCreativity\\Utils\\Collection\\": "test/"
         }
     },
     "config": {
