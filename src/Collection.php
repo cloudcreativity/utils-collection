@@ -42,7 +42,7 @@ class Collection implements Iterator, Countable
      * Collection constructor.
      * @param array $items
      */
-    public function __construct($items = array())
+    public function __construct($items = [])
     {
         if ($items instanceof static) {
             $items = $items->toArray();
@@ -436,7 +436,7 @@ class Collection implements Iterator, Countable
             throw new OutOfBoundsException(sprintf('Index "%s" is out of bounds.', $index));
         }
 
-        array_splice($this->stack, $index, 0, array($item));
+        array_splice($this->stack, $index, 0, [$item]);
 
         return $this;
     }
@@ -765,7 +765,7 @@ class Collection implements Iterator, Countable
      */
     public function removeMany($items, $strict = false)
     {
-        $stack = array();
+        $stack = [];
 
         if (!is_array($items)) {
             $items = $this->cast($items)->toArray();

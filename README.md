@@ -7,6 +7,27 @@ This package also contains our `StandardIteratorInterface`. We use this if we
 are writing specific collection classes that hold only particular types of
 objects.
 
+## License
+
+Apache License (Version 2.0). Please see [License File](LICENSE) for more information.
+
+## Contributing
+
+File an issue, or ideally submit a pull request. Bug fixes should be submitted against the `master` branch,
+new features/changes should be submitted against the `develop` branch. Pull requests should have updated or new
+unit tests in them.
+
+Make sure your IDE has an [EditorConfig](http://editorconfig.org) plugin installed.
+
+## Testing
+
+Clone the repository, then:
+
+``` bash
+composer install
+bin/phpunit
+```
+
 ## Collection
 
 The `CloudCreativity\Utils\Collection\Collection` is a standard class for

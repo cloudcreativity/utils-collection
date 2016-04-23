@@ -118,7 +118,7 @@ class CollectionTest extends TestCase
 
     public function testAny()
     {
-        $collection = new Collection(array('foo', 10));
+        $collection = new Collection(['foo', 10]);
 
         $this->assertTrue($collection->any(function ($value) {
             return is_int($value);
@@ -196,7 +196,7 @@ class CollectionTest extends TestCase
     }
 
     /**
-    *  @param Collection $collection
+     * @param Collection $collection
      * @depends testFilter
      */
     public function testFilterReceivesKey(Collection $collection)
