@@ -33,6 +33,16 @@ class StandardIteratorTest extends TestCase
         $this->iterator = new TestIterator(['a', 'b', 'c']);
     }
 
+    public function testIterator()
+    {
+        $this->assertEquals(['a', 'b', 'c'], iterator_to_array($this->iterator));
+    }
+
+    public function testImplementsInterface()
+    {
+        $this->assertInstanceOf(StandardIteratorInterface::class, $this->iterator);
+    }
+
     public function testGetAll()
     {
         $this->assertSame(['a', 'b', 'c'], $this->iterator->getAll());

@@ -18,7 +18,7 @@
 
 namespace CloudCreativity\Utils\Collection;
 
-abstract class AbstractStandardIterator
+abstract class AbstractStandardIterator implements StandardIteratorInterface
 {
 
     use StandardIteratorTrait;
