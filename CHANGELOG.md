@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file. This projec
 - `AbstractStandardIterator` did not implement `StandardIteratorInterface`
 
 ## [0.1.0] - 2016-04-23
+
 Initial development release.
 
 ### Added

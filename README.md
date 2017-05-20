@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/cloudcreativity/utils-collection.svg?branch=master)](https://travis-ci.org/cloudcreativity/utils-collection)
+
 # cloudcreativity/utils-collection
 
 Our standard collection class for handling lists in PHP. By lists, we mean
