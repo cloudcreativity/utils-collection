@@ -28,7 +28,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "CloudCreativity\\Utils\\Collection\\": "test/"
+            "CloudCreativity\\Utils\\Collection\\Tests\\": "tests/"
         }
     },
     "extra": {

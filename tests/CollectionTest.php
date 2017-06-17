@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,21 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\Utils\Collection;
+namespace CloudCreativity\Utils\Collection\Tests;
 
 use ArrayObject;
+use CloudCreativity\Utils\Collection\Collection;
 use DateTime;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use stdClass;
 
+/**
+ * Class CollectionTest
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 class CollectionTest extends TestCase
 {
 
@@ -377,7 +383,7 @@ class CollectionTest extends TestCase
      */
     public function testIndexOfOutOfBounds(Collection $collection)
     {
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         $collection->indexOf('a', count($collection));
     }
 
@@ -402,7 +408,7 @@ class CollectionTest extends TestCase
      */
     public function testInsertAtOutOfBounds(Collection $collection)
     {
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         $collection->insertAt(count($collection) + 1, 'foobar');
     }
 
@@ -614,7 +620,7 @@ class CollectionTest extends TestCase
      */
     public function testRemoveAtOutOfBounds(Collection $collection)
     {
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         $collection->removeAt(count($collection));
     }
 
@@ -728,10 +734,9 @@ class CollectionTest extends TestCase
         };
 
         $actual = $collection->sync(4, $callback);
-        $this->assertEquals(new Collection([10, 20, 30, 40]), $actual);
+        $this->assertSame([10, 20, 30, 40], $actual->all());
         $this->assertNotSame($collection, $actual);
-
-        $this->assertEquals(new Collection([10, 20]), $collection->sync(2, $callback));
+        $this->assertSame([10, 20], $collection->sync(2, $callback)->all());
 
         /** Overflow with no callable */
         $extra = new Collection();
@@ -739,8 +744,8 @@ class CollectionTest extends TestCase
             $extra->push($item);
         });
 
-        $this->assertEquals(new Collection([1, 2]), $actual);
-        $this->assertEquals(new Collection([3, 4]), $extra);
+        $this->assertSame([1, 2], $actual->all());
+        $this->assertSame([3, 4], $extra->all());
 
         /** Callable and overflow */
         $extra = new Collection();
@@ -748,15 +753,13 @@ class CollectionTest extends TestCase
             $extra->push($item);
         });
 
-        $this->assertEquals(new Collection([10, 20]), $actual);
-        $this->assertEquals(new Collection([3, 4]), $extra);
+        $this->assertSame([10, 20], $actual->all());
+        $this->assertSame([3, 4], $extra->all());
 
         /** Size is less than current length */
-        $this->assertEquals(new Collection([
-            10, 20, 30, 40, 'foo', 'foo'
-        ]), $collection->sync(6, $callback, function () {
+        $this->assertSame([10, 20, 30, 40, 'foo', 'foo'], $collection->sync(6, $callback, function () {
             $this->fail('Overflow callback should not be invoked when there is no overflow.');
-        }));
+        })->all());
     }
 
     public function testToArray()

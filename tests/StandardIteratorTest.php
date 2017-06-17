@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,17 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\Utils\Collection;
+namespace CloudCreativity\Utils\Collection\Tests;
 
+use CloudCreativity\Utils\Collection\StandardIteratorInterface;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Class StandardIteratorTest
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 class StandardIteratorTest extends TestCase
 {
 
