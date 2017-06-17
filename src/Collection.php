@@ -22,6 +22,7 @@ use Countable;
 use InvalidArgumentException;
 use Iterator;
 use OutOfBoundsException;
+use RuntimeException;
 use stdClass;
 use Traversable;
 
@@ -449,24 +450,25 @@ class Collection implements Iterator, Countable
      * collection the specified method will be invoked with the provided
      * argument(s).
      *
-     * @param string $method
-     * @param mixed $arg
-     *      argument or array of arguments to use with the invoke method.
+     * @param $method
+     * @param array ...$args
      * @return Collection
      */
-    public function invoke($method, $args)
+    public function invoke($method, ...$args)
     {
-        $args = (array) $args;
-
-        return $this->map(function ($item) use ($methods, $args) {
-            if (!is_object($item)) {
+        return $this->map(function ($item) use ($method, $args) {
+            if (is_null($item)) {
                 return null;
+            }
+
+            if (!is_object($item)) {
+                throw new RuntimeException('Collection contains a non-object.');
             }
 
             $callable = [$item, $method];
 
             if (!is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('Cannot call %s on object %s', $method, get_class($object)));
+                throw new RuntimeException(sprintf('Cannot call method %s::%s', get_class($item), $method));
             }
 
             return call_user_func_array($callable, $args);

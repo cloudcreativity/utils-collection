@@ -19,8 +19,11 @@
 namespace CloudCreativity\Utils\Collection;
 
 use ArrayObject;
+use DateTime;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 use stdClass;
 
 class CollectionTest extends TestCase
@@ -402,6 +405,33 @@ class CollectionTest extends TestCase
     {
         $this->setExpectedException(OutOfBoundsException::class);
         $collection->insertAt(count($collection) + 1, 'foobar');
+    }
+
+    public function testInvoke()
+    {
+        $collection = new Collection([
+            $a = new DateTime(),
+            $b = new DateTime('-1 day'),
+            null
+        ]);
+
+        $expected = [$a->format('c'), $b->format('c'), null];
+        $this->assertSame($expected, $collection->invoke('format', 'c')->toArray());
+    }
+
+    public function testInvokeInvalidMethod()
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('DateTime::foo');
+        $collection = new Collection([new DateTime()]);
+        $collection->invoke('foo');
+    }
+
+    public function testInvokeNonObject()
+    {
+        $this->expectException(RuntimeException::class);
+        $collection = new Collection(['foo']);
+        $collection->invoke('foo');
     }
 
     public function testItemAt()

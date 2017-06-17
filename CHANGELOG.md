@@ -13,6 +13,9 @@ All notable changes to this project will be documented in this file. This projec
 - Standard iterator method `getAll` is now `all`.
 - Methods on the standard iterator interface are now type hinted to receive a `Closure` rather than a `callable`.
 
+### Fixed
+- Invalid variable name in `Collection::invoke`.
+
 ## [0.1.1] - 2016-09-30
 
 ### Fixed
