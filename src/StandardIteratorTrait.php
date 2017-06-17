@@ -39,7 +39,7 @@ trait StandardIteratorTrait
      */
     public function all()
     {
-        return $this->stack->toArray();
+        return $this->stack->all();
     }
 
     /**
@@ -80,7 +80,7 @@ trait StandardIteratorTrait
 
     /**
      * @param Closure $callback
-     * @return StandardIteratorInterface
+     * @return static
      */
     public function filter(Closure $callback)
     {
@@ -92,7 +92,7 @@ trait StandardIteratorTrait
 
     /**
      * @param Closure $callback
-     * @return StandardIteratorInterface
+     * @return static
      */
     public function reject(Closure $callback)
     {
