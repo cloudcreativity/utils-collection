@@ -161,6 +161,14 @@ class Collection implements Iterator, Countable
     }
 
     /**
+     * @return array
+     */
+    public function all()
+    {
+        return $this->stack;
+    }
+
+    /**
      * Returns true if the supplied callback returns true for any item in the collection.
      *
      * The supplied callback should have the following signature:
@@ -327,7 +335,6 @@ class Collection implements Iterator, Countable
         $collection = new static();
 
         foreach ($this as $key => $value) {
-
             if (false != call_user_func($callback, $value, $key)) {
                 $collection->stack[] = $value;
             }
@@ -939,10 +946,11 @@ class Collection implements Iterator, Countable
      * Return an array copy of this collection.
      *
      * @return array
+     * @deprecated use `all` instead.
      */
     public function toArray()
     {
-        return $this->stack;
+        return $this->all();
     }
 
     /**

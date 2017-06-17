@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 - Standard iterator can now be cast to a collection using the `collect` method.
 - `isNotEmpty` method added to collection and standard iterator.
+- Collection `all` method to get the collection as an array.
 
 ### Changed
 - Abstract standard iterator is now immutable by default.
@@ -15,6 +16,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Fixed
 - Invalid variable name in `Collection::invoke`.
+
+### Deprecated
+- `Collection::toArray` is deprecated in favour of `Collection::all`
 
 ## [0.1.1] - 2016-09-30
 
