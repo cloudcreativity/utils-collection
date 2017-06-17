@@ -20,6 +20,7 @@ namespace CloudCreativity\Utils\Collection;
 
 use ArrayObject;
 use OutOfBoundsException;
+use PHPUnit\Framework\TestCase;
 use stdClass;
 
 class CollectionTest extends TestCase

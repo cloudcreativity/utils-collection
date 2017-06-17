@@ -22,6 +22,17 @@ class TestIterator extends AbstractStandardIterator
 {
 
     /**
+     * TestIterator constructor.
+     *
+     * @param array $items
+     */
+    public function __construct(array $items = [])
+    {
+        parent::__construct();
+        $this->addMany($items);
+    }
+
+    /**
      * @param array $items
      * @return $this
      */

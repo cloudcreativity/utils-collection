@@ -24,19 +24,11 @@ abstract class AbstractStandardIterator implements StandardIteratorInterface
     use StandardIteratorTrait;
 
     /**
-     * @param array £items
-     * @return $this
-     */
-    abstract public function addMany(array $items);
-
-    /**
      * AbstractStandardIterator constructor.
-     * @param array $items
      */
-    public function __construct(array $items = [])
+    public function __construct()
     {
         $this->stack = new Collection();
-        $this->addMany($items);
     }
 
     /**

@@ -19,12 +19,13 @@
 namespace CloudCreativity\Utils\Collection;
 
 use OutOfBoundsException;
+use PHPUnit\Framework\TestCase;
 
 class StandardIteratorTest extends TestCase
 {
 
     /**
-     * @param TestIterator
+     * @var TestIterator
      */
     private $iterator;
 
@@ -45,14 +46,14 @@ class StandardIteratorTest extends TestCase
 
     public function testGetAll()
     {
-        $this->assertSame(['a', 'b', 'c'], $this->iterator->getAll());
+        $this->assertSame(['a', 'b', 'c'], $this->iterator->all());
     }
 
     public function testFirst()
     {
         $this->assertSame('a', $this->iterator->first());
 
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         (new TestIterator())->first();
     }
 
@@ -60,7 +61,7 @@ class StandardIteratorTest extends TestCase
     {
         $this->assertSame('c', $this->iterator->last());
 
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         (new TestIterator())->last();
     }
 
