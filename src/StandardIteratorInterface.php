@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,17 +18,28 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+use Closure;
 use Countable;
 use IteratorAggregate;
 use OutOfBoundsException;
 
+/**
+ * Interface StandardIteratorInterface
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 interface StandardIteratorInterface extends IteratorAggregate, Countable
 {
 
     /**
      * @return array
      */
-    public function getAll();
+    public function all();
+
+    /**
+     * @return Collection
+     */
+    public function collect();
 
     /**
      * @return mixed
@@ -45,31 +56,36 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function last();
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return StandardIteratorInterface
      */
-    public function filter(callable $callback);
+    public function filter(Closure $callback);
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return StandardIteratorInterface
      */
-    public function reject(callable $callback);
+    public function reject(Closure $callback);
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return bool
      */
-    public function every(callable $callback);
+    public function every(Closure $callback);
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return bool
      */
-    public function any(callable $callback);
+    public function any(Closure $callback);
 
     /**
      * @return bool
      */
     public function isEmpty();
+
+    /**
+     * @return bool
+     */
+    public function isNotEmpty();
 }

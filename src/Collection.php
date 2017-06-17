@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,15 @@ use Countable;
 use InvalidArgumentException;
 use Iterator;
 use OutOfBoundsException;
+use RuntimeException;
 use stdClass;
 use Traversable;
 
+/**
+ * Class Collection
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 class Collection implements Iterator, Countable
 {
 
@@ -40,6 +46,7 @@ class Collection implements Iterator, Countable
 
     /**
      * Collection constructor.
+     *
      * @param array $items
      */
     public function __construct($items = [])
@@ -157,6 +164,14 @@ class Collection implements Iterator, Countable
         }
 
         return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function all()
+    {
+        return $this->stack;
     }
 
     /**
@@ -326,7 +341,6 @@ class Collection implements Iterator, Countable
         $collection = new static();
 
         foreach ($this as $key => $value) {
-
             if (false != call_user_func($callback, $value, $key)) {
                 $collection->stack[] = $value;
             }
@@ -449,24 +463,25 @@ class Collection implements Iterator, Countable
      * collection the specified method will be invoked with the provided
      * argument(s).
      *
-     * @param string $method
-     * @param mixed $arg
-     *      argument or array of arguments to use with the invoke method.
+     * @param $method
+     * @param array ...$args
      * @return Collection
      */
-    public function invoke($method, $args)
+    public function invoke($method, ...$args)
     {
-        $args = (array) $args;
-
-        return $this->map(function ($item) use ($methods, $args) {
-            if (!is_object($item)) {
+        return $this->map(function ($item) use ($method, $args) {
+            if (is_null($item)) {
                 return null;
+            }
+
+            if (!is_object($item)) {
+                throw new RuntimeException('Collection contains a non-object.');
             }
 
             $callable = [$item, $method];
 
             if (!is_callable($callable)) {
-                throw new InvalidArgumentException(sprintf('Cannot call %s on object %s', $method, get_class($object)));
+                throw new RuntimeException(sprintf('Cannot call method %s::%s', get_class($item), $method));
             }
 
             return call_user_func_array($callable, $args);
@@ -481,6 +496,16 @@ class Collection implements Iterator, Countable
     public function isEmpty()
     {
         return empty($this->stack);
+    }
+
+    /**
+     * Is the collection not empty?
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return !$this->isEmpty();
     }
 
     /**
@@ -927,10 +952,11 @@ class Collection implements Iterator, Countable
      * Return an array copy of this collection.
      *
      * @return array
+     * @deprecated use `all` instead.
      */
     public function toArray()
     {
-        return $this->stack;
+        return $this->all();
     }
 
     /**

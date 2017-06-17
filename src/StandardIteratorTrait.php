@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,22 +18,36 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+use Closure;
 use OutOfBoundsException;
 
+/**
+ * Trait StandardIteratorTrait
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 trait StandardIteratorTrait
 {
 
     /**
-     * @var Collection|null
+     * @var Collection
      */
     protected $stack;
 
     /**
      * @return array
      */
-    public function getAll()
+    public function all()
     {
-        return $this->stack()->toArray();
+        return $this->stack->all();
+    }
+
+    /**
+     * @return Collection
+     */
+    public function collect()
+    {
+        return clone $this->stack;
     }
 
     /**
@@ -47,7 +61,7 @@ trait StandardIteratorTrait
             throw new OutOfBoundsException('No items.');
         }
 
-        return $this->stack()->first();
+        return $this->stack->first();
     }
 
     /**
@@ -61,49 +75,49 @@ trait StandardIteratorTrait
             throw new OutOfBoundsException('No items.');
         }
 
-        return $this->stack()->last();
+        return $this->stack->last();
     }
 
     /**
-     * @param callable $callback
-     * @return StandardIterator
+     * @param Closure $callback
+     * @return static
      */
-    public function filter(callable $callback)
+    public function filter(Closure $callback)
     {
         $filtered = new static();
-        $filtered->stack = $this->stack()->filter($callback);
+        $filtered->stack = $this->stack->filter($callback);
 
         return $filtered;
     }
 
     /**
-     * @param callable $callback
-     * @return StandardIterator
+     * @param Closure $callback
+     * @return static
      */
-    public function reject(callable $callback)
+    public function reject(Closure $callback)
     {
         $filtered = new static();
-        $filtered->stack = $this->stack()->reject($callback);
+        $filtered->stack = $this->stack->reject($callback);
 
         return $filtered;
     }
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return bool
      */
-    public function every(callable $callback)
+    public function every(Closure $callback)
     {
-        return $this->stack()->every($callback);
+        return $this->stack->every($callback);
     }
 
     /**
-     * @param callable $callback
+     * @param Closure $callback
      * @return bool
      */
-    public function any(callable $callback)
+    public function any(Closure $callback)
     {
-        return $this->stack()->any($callback);
+        return $this->stack->any($callback);
     }
 
     /**
@@ -111,7 +125,15 @@ trait StandardIteratorTrait
      */
     public function isEmpty()
     {
-        return $this->stack()->isEmpty();
+        return $this->stack->isEmpty();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return !$this->isEmpty();
     }
 
     /**
@@ -119,7 +141,7 @@ trait StandardIteratorTrait
      */
     public function getIterator()
     {
-        return $this->stack()->copy();
+        return $this->stack->copy();
     }
 
     /**
@@ -127,18 +149,7 @@ trait StandardIteratorTrait
      */
     public function count()
     {
-        return $this->stack()->count();
+        return $this->stack->count();
     }
 
-    /**
-     * @return Collection
-     */
-    protected function stack()
-    {
-        if (!$this->stack instanceof Collection) {
-            $this->stack = new Collection();
-        }
-
-        return $this->stack;
-    }
 }

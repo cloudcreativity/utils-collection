@@ -80,6 +80,7 @@ collection;
 * `every`
 * `indexOf`
 * `isEmpty`
+* `isNotEmpty`
 * `search`
 
 ### Helpers

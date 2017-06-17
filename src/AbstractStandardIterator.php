@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,25 +18,22 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+/**
+ * Class AbstractStandardIterator
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 abstract class AbstractStandardIterator implements StandardIteratorInterface
 {
 
     use StandardIteratorTrait;
 
     /**
-     * @param array £items
-     * @return $this
-     */
-    abstract public function addMany(array $items);
-
-    /**
      * AbstractStandardIterator constructor.
-     * @param array $items
      */
-    public function __construct(array $items = [])
+    public function __construct()
     {
         $this->stack = new Collection();
-        $this->addMany($items);
     }
 
     /**

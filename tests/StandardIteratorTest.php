@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Copyright 2016 Cloud Creativity Limited
+ * Copyright 2017 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,15 +16,22 @@
  * limitations under the License.
  */
 
-namespace CloudCreativity\Utils\Collection;
+namespace CloudCreativity\Utils\Collection\Tests;
 
+use CloudCreativity\Utils\Collection\StandardIteratorInterface;
 use OutOfBoundsException;
+use PHPUnit\Framework\TestCase;
 
+/**
+ * Class StandardIteratorTest
+ *
+ * @package CloudCreativity\Utils\Collection
+ */
 class StandardIteratorTest extends TestCase
 {
 
     /**
-     * @param TestIterator
+     * @var TestIterator
      */
     private $iterator;
 
@@ -45,14 +52,14 @@ class StandardIteratorTest extends TestCase
 
     public function testGetAll()
     {
-        $this->assertSame(['a', 'b', 'c'], $this->iterator->getAll());
+        $this->assertSame(['a', 'b', 'c'], $this->iterator->all());
     }
 
     public function testFirst()
     {
         $this->assertSame('a', $this->iterator->first());
 
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         (new TestIterator())->first();
     }
 
@@ -60,7 +67,7 @@ class StandardIteratorTest extends TestCase
     {
         $this->assertSame('c', $this->iterator->last());
 
-        $this->setExpectedException(OutOfBoundsException::class);
+        $this->expectException(OutOfBoundsException::class);
         (new TestIterator())->last();
     }
 
@@ -114,6 +121,12 @@ class StandardIteratorTest extends TestCase
     {
         $this->assertFalse($this->iterator->isEmpty());
         $this->assertTrue((new TestIterator())->isEmpty());
+    }
+
+    public function testIsNotEmpty()
+    {
+        $this->assertTrue($this->iterator->isNotEmpty());
+        $this->assertFalse((new TestIterator())->isNotEmpty());
     }
 
     public function testCount()
