@@ -440,6 +440,15 @@ class CollectionTest extends TestCase
         $this->assertFalse($collection->isEmpty());
     }
 
+    public function testIsNotEmpty()
+    {
+        $collection = new Collection();
+
+        $this->assertFalse($collection->isNotEmpty());
+        $collection->push('a');
+        $this->assertTrue($collection->isNotEmpty());
+    }
+
     public function testUnique()
     {
         $collection = new Collection(['a', 'b', 'a', null, 'b', 10, '10']);

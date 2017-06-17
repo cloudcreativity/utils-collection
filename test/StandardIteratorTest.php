@@ -117,6 +117,12 @@ class StandardIteratorTest extends TestCase
         $this->assertTrue((new TestIterator())->isEmpty());
     }
 
+    public function testIsNotEmpty()
+    {
+        $this->assertTrue($this->iterator->isNotEmpty());
+        $this->assertFalse((new TestIterator())->isNotEmpty());
+    }
+
     public function testCount()
     {
         $this->assertSame(3, $this->iterator->count());

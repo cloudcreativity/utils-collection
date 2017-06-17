@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 - Standard iterator can now be cast to a collection using the `collect` method.
+- `isNotEmpty` method added to collection and standard iterator.
 
 ### Changed
 - Abstract standard iterator is now immutable by default.

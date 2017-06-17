@@ -78,4 +78,9 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
      * @return bool
      */
     public function isEmpty();
+
+    /**
+     * @return bool
+     */
+    public function isNotEmpty();
 }

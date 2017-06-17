@@ -484,6 +484,16 @@ class Collection implements Iterator, Countable
     }
 
     /**
+     * Is the collection not empty?
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return !$this->isEmpty();
+    }
+
+    /**
      * Get the item at the supplied index, or null if the index does not exist.
      *
      * @param integer $index

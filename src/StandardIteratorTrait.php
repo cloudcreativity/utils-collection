@@ -124,6 +124,14 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return !$this->isEmpty();
+    }
+
+    /**
      * @return Collection
      */
     public function getIterator()
