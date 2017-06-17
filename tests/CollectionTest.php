@@ -762,13 +762,6 @@ class CollectionTest extends TestCase
         })->all());
     }
 
-    public function testToArray()
-    {
-        $collection = new Collection($expected = ['a', 'b', 'c']);
-
-        $this->assertSame($expected, $collection->toArray());
-    }
-
     public function testUnshift()
     {
         $collection = new Collection(['a', 'b']);

@@ -45,6 +45,35 @@ class Collection implements Iterator, Countable
     private $stack = [];
 
     /**
+     * Cast the supplied collection to a Collection object.
+     *
+     * If `$collection` is already a Collection, then the same object
+     * will be returned. If it is an array or Traversable object, it will be
+     * converted to a Collection object.
+     *
+     * @param array|Traversable
+     * @return Collection
+     */
+    public static function cast($items)
+    {
+        if ($items instanceof static) {
+            return $items;
+        } elseif (is_array($items) || $items instanceof self) {
+            return new static($items);
+        } elseif (!$items instanceof Traversable && !$items instanceof stdClass) {
+            throw new InvalidArgumentException('Expecting a Traversable object or an array.');
+        }
+
+        $cast = new static();
+
+        foreach ($items as $value) {
+            $cast->push($value);
+        }
+
+        return $cast;
+    }
+
+    /**
      * Collection constructor.
      *
      * @param array $items
@@ -52,7 +81,7 @@ class Collection implements Iterator, Countable
     public function __construct($items = [])
     {
         if ($items instanceof static) {
-            $items = $items->toArray();
+            $items = $items->all();
         } elseif (is_array($items)) {
             $items = array_values($items);
         } else {
@@ -586,7 +615,7 @@ class Collection implements Iterator, Countable
      *
      * @param $size
      * @param mixed|null $value
-     * @return static
+     * @return Collection
      */
     public function pad($size, $value = null)
     {
@@ -793,7 +822,7 @@ class Collection implements Iterator, Countable
         $stack = [];
 
         if (!is_array($items)) {
-            $items = $this->cast($items)->toArray();
+            $items = $this->cast($items)->all();
         }
 
         foreach ($this as $value) {
@@ -816,7 +845,7 @@ class Collection implements Iterator, Countable
      */
     public function replace($items)
     {
-        $this->stack = $this->cast($items)->toArray();
+        $this->stack = $this->cast($items)->all();
 
         return $this;
     }
@@ -949,17 +978,6 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Return an array copy of this collection.
-     *
-     * @return array
-     * @deprecated use `all` instead.
-     */
-    public function toArray()
-    {
-        return $this->all();
-    }
-
-    /**
      * Returns a new collection containing only unique values within this collection.
      *
      * @param bool $strict
@@ -1000,7 +1018,7 @@ class Collection implements Iterator, Countable
      */
     public function unshiftMany($items)
     {
-        $this->stack = array_merge($this->cast($items)->toArray(), $this->stack);
+        $this->stack = array_merge($this->cast($items)->all(), $this->stack);
 
         return $this;
     }
@@ -1049,34 +1067,5 @@ class Collection implements Iterator, Countable
         return $this->filter(function ($value) use ($item, $strict) {
             return ($strict && $item !== $value) || (!$strict && $item != $value);
         });
-    }
-
-    /**
-     * Cast the supplied collection to a Collection object.
-     *
-     * If `$collection` is already a Collection, then the same object
-     * will be returned. If it is an array or Traversable object, it will be
-     * converted to a Collection object.
-     *
-     * @param array|Traversable
-     * @return Collection
-     */
-    public static function cast($items)
-    {
-        if ($items instanceof static) {
-            return $items;
-        } elseif (is_array($items) || $items instanceof self) {
-            return new static($items);
-        } elseif (!$items instanceof Traversable && !$items instanceof stdClass) {
-            throw new InvalidArgumentException('Expecting a Traversable object or an array.');
-        }
-
-        $cast = new static();
-
-        foreach ($items as $value) {
-            $cast->push($value);
-        }
-
-        return $cast;
     }
 }

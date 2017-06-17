@@ -88,6 +88,7 @@ collection;
 The following methods assist with handling the list, and return new instances
 of the collection. (I.e. the original collection is not modified.)
 
+* `all`
 * `cast` (static)
 * `chunk`
 * `compact`
@@ -105,6 +106,5 @@ of the collection. (I.e. the original collection is not modified.)
 * `slice`
 * `sort`
 * `sync`
-* `toArray`
 * `unique`
 * `without`
