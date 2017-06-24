@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+- Collection now has a static `create` method, for fluent construction.
+
+### Changed
+- Collection constructor now uses variable-length arguments.
+- Collection casting now longer accepts objects unless they are traversable.
+
 ### Removed
 - Remove the deprecated `Collection::toArray` method.
 

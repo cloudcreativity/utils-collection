@@ -23,7 +23,6 @@ use InvalidArgumentException;
 use Iterator;
 use OutOfBoundsException;
 use RuntimeException;
-use stdClass;
 use Traversable;
 
 /**
@@ -42,7 +41,18 @@ class Collection implements Iterator, Countable
     /**
      * @var array
      */
-    private $stack = [];
+    private $stack;
+
+    /**
+     * Fluent constructor.
+     *
+     * @param array ...$items
+     * @return Collection
+     */
+    public static function create(...$items)
+    {
+        return new self(...$items);
+    }
 
     /**
      * Cast the supplied collection to a Collection object.
@@ -51,43 +61,29 @@ class Collection implements Iterator, Countable
      * will be returned. If it is an array or Traversable object, it will be
      * converted to a Collection object.
      *
-     * @param array|Traversable
+     * @param self|array|Traversable $items
      * @return Collection
      */
     public static function cast($items)
     {
         if ($items instanceof static) {
             return $items;
-        } elseif (is_array($items) || $items instanceof self) {
-            return new static($items);
-        } elseif (!$items instanceof Traversable && !$items instanceof stdClass) {
-            throw new InvalidArgumentException('Expecting a Traversable object or an array.');
+        } elseif (is_array($items)) {
+            return new self(...array_values($items));
+        } elseif ($items instanceof Traversable) {
+            return new self(...$items);
         }
 
-        $cast = new static();
-
-        foreach ($items as $value) {
-            $cast->push($value);
-        }
-
-        return $cast;
+        throw new InvalidArgumentException('Cannot cast provided value to a collection.');
     }
 
     /**
      * Collection constructor.
      *
-     * @param array $items
+     * @param array ...$items
      */
-    public function __construct($items = [])
+    public function __construct(...$items)
     {
-        if ($items instanceof static) {
-            $items = $items->all();
-        } elseif (is_array($items)) {
-            $items = array_values($items);
-        } else {
-            throw new InvalidArgumentException('Expecting an array or a Collection object.');
-        }
-
         $this->stack = $items;
     }
 
@@ -239,7 +235,7 @@ class Collection implements Iterator, Countable
         $ret = [];
 
         foreach (array_chunk($this->stack, $size, false) as $chunk) {
-            $ret[] = new static($chunk);
+            $ret[] = new static(...$chunk);
         }
 
         return $ret;

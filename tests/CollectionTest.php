@@ -21,6 +21,7 @@ namespace CloudCreativity\Utils\Collection\Tests;
 use ArrayObject;
 use CloudCreativity\Utils\Collection\Collection;
 use DateTime;
+use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -37,7 +38,7 @@ class CollectionTest extends TestCase
     public function testConstruct()
     {
         $expected = ['foo', 'bar'];
-        $collection = new Collection($expected);
+        $collection = new Collection(...$expected);
 
         $this->assertSame($expected, $collection->all());
 
@@ -67,17 +68,13 @@ class CollectionTest extends TestCase
 
     public function testAdd()
     {
-        $expected = ['foo'];
-
-        $collection = new Collection($expected);
+        $collection = new Collection('foo');
         $check = $collection->add('foo');
 
         $this->assertSame($collection, $check, 'Expecting `add` to be chainable.');
-        $this->assertSame($expected, $collection->all());
-        $this->assertSame($expected, $collection->add('foo')->all());
-
-        $expected[] = 'bar';
-        $this->assertSame($expected, $collection->add('bar')->all());
+        $this->assertSame(['foo'], $collection->all());
+        $this->assertSame(['foo'], $collection->add('foo')->all());
+        $this->assertSame(['foo', 'bar'], $collection->add('bar')->all());
 
         return $collection;
     }
@@ -101,7 +98,7 @@ class CollectionTest extends TestCase
 
     public function testAddMany()
     {
-        $collection = new Collection(['foo']);
+        $collection = new Collection('foo');
         $expected = ['foo', 'bar'];
 
         $check = $collection->addMany(['foo', 'bar', 'bar']);
@@ -127,7 +124,7 @@ class CollectionTest extends TestCase
 
     public function testAny()
     {
-        $collection = new Collection(['foo', 10]);
+        $collection = new Collection('foo', 10);
 
         $this->assertTrue($collection->any(function ($value) {
             return is_int($value);
@@ -162,27 +159,27 @@ class CollectionTest extends TestCase
 
     public function testChunk()
     {
-        $collection = new Collection(['a', 'b', 'c', 'd']);
+        $collection = new Collection('a', 'b', 'c', 'd');
 
         $this->assertEquals([
-            new Collection(['a', 'b', 'c']),
-            new Collection(['d']),
+            new Collection('a', 'b', 'c'),
+            new Collection('d'),
         ], $collection->chunk(3));
 
         $this->assertEquals([
-            new Collection(['a', 'b']),
-            new Collection(['c', 'd']),
+            new Collection('a', 'b'),
+            new Collection('c', 'd'),
         ], $collection->chunk(2));
 
         $this->assertEquals([
-            new Collection(['a', 'b', 'c', 'd']),
+            new Collection('a', 'b', 'c', 'd'),
         ], $collection->chunk(5));
     }
 
     public function testCompact()
     {
-        $collection = new Collection(['foo', null, 'bar', null]);
-        $expected = new Collection(['foo', 'bar']);
+        $collection = new Collection('foo', null, 'bar', null);
+        $expected = new Collection('foo', 'bar');
         $check = $collection->compact();
 
         $this->assertNotSame($collection, $check);
@@ -191,8 +188,8 @@ class CollectionTest extends TestCase
 
     public function testFilter()
     {
-        $collection = new Collection(['a', 10, 'b']);
-        $expected = new Collection(['a', 'b']);
+        $collection = new Collection('a', 10, 'b');
+        $expected = new Collection('a', 'b');
 
         $actual = $collection->filter(function ($value) {
             return is_string($value);
@@ -222,7 +219,7 @@ class CollectionTest extends TestCase
 
     public function testFind()
     {
-        $collection = new Collection(['a', 10, 'b']);
+        $collection = new Collection('a', 10, 'b');
 
         $found = $collection->find(function ($value) {
             return is_int($value);
@@ -257,7 +254,7 @@ class CollectionTest extends TestCase
 
     public function testContains()
     {
-        $collection = new Collection(['a', '10']);
+        $collection = new Collection('a', '10');
 
         $this->assertTrue($collection->contains('a'));
         $this->assertFalse($collection->contains('b'));
@@ -279,12 +276,12 @@ class CollectionTest extends TestCase
     {
         $arr = ['a', 'b'];
 
-        $this->assertSame(count($arr), count(new Collection($arr)));
+        $this->assertSame(count($arr), count(new Collection(...$arr)));
     }
 
     public function testEquals()
     {
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
 
         $this->assertTrue($collection->equals(clone $collection));
 
@@ -316,7 +313,7 @@ class CollectionTest extends TestCase
 
     public function testEvery()
     {
-        $collection = new Collection(['a', 'b', 10]);
+        $collection = new Collection('a', 'b', 10);
 
         $this->assertTrue($collection->every(function ($value) {
             return is_scalar($value);
@@ -356,7 +353,7 @@ class CollectionTest extends TestCase
 
     public function testIndexOf()
     {
-        $collection = new Collection(['a', 'b', 'a']);
+        $collection = new Collection('a', 'b', 'a');
 
         $this->assertSame(0, $collection->indexOf('a'));
         $this->assertSame(2, $collection->indexOf('a', 1));
@@ -389,7 +386,7 @@ class CollectionTest extends TestCase
 
     public function testInsertAt()
     {
-        $collection = new Collection(['a', 'a']);
+        $collection = new Collection('a', 'a');
 
         $check = $collection->insertAt(1, 'b');
 
@@ -414,11 +411,11 @@ class CollectionTest extends TestCase
 
     public function testInvoke()
     {
-        $collection = new Collection([
+        $collection = new Collection(
             $a = new DateTime(),
             $b = new DateTime('-1 day'),
             null
-        ]);
+        );
 
         $expected = [$a->format('c'), $b->format('c'), null];
         $this->assertSame($expected, $collection->invoke('format', 'c')->all());
@@ -428,21 +425,21 @@ class CollectionTest extends TestCase
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('DateTime::foo');
-        $collection = new Collection([new DateTime()]);
+        $collection = new Collection(new DateTime());
         $collection->invoke('foo');
     }
 
     public function testInvokeNonObject()
     {
         $this->expectException(RuntimeException::class);
-        $collection = new Collection(['foo']);
+        $collection = new Collection('foo');
         $collection->invoke('foo');
     }
 
     public function testItemAt()
     {
         $arr = ['a', 'b'];
-        $collection = new Collection($arr);
+        $collection = new Collection(...$arr);
 
         $this->assertSame($arr[0], $collection->itemAt(0));
         $this->assertSame($arr[1], $collection->itemAt(1));
@@ -451,8 +448,8 @@ class CollectionTest extends TestCase
 
     public function testItemsAt()
     {
-        $collection = new Collection(['a', 'b', 'c']);
-        $expected = new Collection(['a', 'c', null]);
+        $collection = new Collection('a', 'b', 'c');
+        $expected = new Collection('a', 'c', null);
         $actual = $collection->itemsAt([0, 2, 3]);
 
         $this->assertEquals($expected, $actual);
@@ -486,7 +483,7 @@ class CollectionTest extends TestCase
 
     public function testUnique()
     {
-        $collection = new Collection(['a', 'b', 'a', null, 'b', 10, '10']);
+        $collection = new Collection('a', 'b', 'a', null, 'b', 10, '10');
 
         $unique = $collection->unique();
         $this->assertNotSame($collection, $unique);
@@ -502,7 +499,7 @@ class CollectionTest extends TestCase
 
     public function testMap()
     {
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
         $expected = ['aa0', 'bb1'];
 
         $mapped = $collection->map(function ($value, $key) {
@@ -516,7 +513,7 @@ class CollectionTest extends TestCase
 
     public function testPop()
     {
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
 
         $this->assertSame('b', $collection->pop());
         $this->assertSame(['a'], $collection->all());
@@ -533,7 +530,7 @@ class CollectionTest extends TestCase
         };
 
         $expected = '-a0-b1';
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
         $actual = $collection->reduce($callback);
 
         $this->assertSame($expected, $actual);
@@ -553,7 +550,7 @@ class CollectionTest extends TestCase
 
     public function testReject()
     {
-        $collection = new Collection(['a', 'b', 10]);
+        $collection = new Collection('a', 'b', 10);
 
         $rejected = $collection->reject(function ($value) {
             return is_string($value);
@@ -583,7 +580,7 @@ class CollectionTest extends TestCase
 
     public function testRemove()
     {
-        $collection = new Collection(['a', 'b', 'a']);
+        $collection = new Collection('a', 'b', 'a');
 
         $this->assertSame($collection, $collection->remove('a'));
         $this->assertSame(['b'], $collection->all());
@@ -593,7 +590,7 @@ class CollectionTest extends TestCase
 
     public function testRemoveUsingStrict()
     {
-        $collection = new Collection([10, '10']);
+        $collection = new Collection(10, '10');
         $other = $collection->copy();
 
         $collection->remove(10);
@@ -605,11 +602,10 @@ class CollectionTest extends TestCase
 
     public function testRemoveAt()
     {
-        $collection = new Collection(['a', 'b', 'c']);
-        $expected = ['a', 'c'];
+        $collection = new Collection('a', 'b', 'c');
 
         $this->assertSame($collection, $collection->removeAt(1), 'Expecting `removeAt` to be chainable.');
-        $this->assertSame($expected, $collection->all());
+        $this->assertSame(['a', 'c'], $collection->all());
 
         return $collection;
     }
@@ -626,7 +622,7 @@ class CollectionTest extends TestCase
 
     public function testRemoveAtWithLength()
     {
-        $collection = new Collection(['a', 'b', 'b', 'b', 'c']);
+        $collection = new Collection('a', 'b', 'b', 'b', 'c');
 
         $this->assertSame(['a', 'c'], $collection->copy()->removeAt(1, 3)->all());
         $this->assertSame(['a', 'b', 'c'], $collection->removeAt(2, 2)->all());
@@ -634,7 +630,7 @@ class CollectionTest extends TestCase
 
     public function testRemoveMany()
     {
-        $collection = new Collection(['a', 'b', 'c', 10, 'b', '10']);
+        $collection = new Collection('a', 'b', 'c', 10, 'b', '10');
         $other = $collection->copy();
         $check = $collection->removeMany(['b', '10']);
 
@@ -650,7 +646,7 @@ class CollectionTest extends TestCase
     public function testReverse()
     {
         $expected = ['c', 'b', 'a'];
-        $collection = new Collection(['a', 'b', 'c']);
+        $collection = new Collection('a', 'b', 'c');
         $reversed = $collection->reverse();
 
         $this->assertInstanceOf(Collection::class, $reversed);
@@ -660,7 +656,7 @@ class CollectionTest extends TestCase
 
     public function testSearch()
     {
-        $collection = new Collection(['a', 10, 'a']);
+        $collection = new Collection('a', 10, 'a');
 
         /** Not strict */
         $this->assertSame(0, $collection->search('a'));
@@ -687,7 +683,7 @@ class CollectionTest extends TestCase
     public function testSlice()
     {
         $original = ['a', 'b', 'c'];
-        $collection = new Collection($original);
+        $collection = new Collection(...$original);
         $expected = ['b', 'c'];
 
         $sliced = $collection->slice(1);
@@ -701,7 +697,7 @@ class CollectionTest extends TestCase
 
     public function testSliceWithEnd()
     {
-        $collection = new Collection(['a', 'b', 'c', 'd']);
+        $collection = new Collection('a', 'b', 'c', 'd');
 
         $this->assertSame(['b', 'c'], $collection->slice(1, 2)->all());
     }
@@ -710,7 +706,7 @@ class CollectionTest extends TestCase
     {
         $original = [3, 1, 2];
         $expected = [1, 2, 3];
-        $collection = new Collection($original);
+        $collection = new Collection(...$original);
 
         $sorted = $collection->sort(function ($a, $b) {
             if ($a == $b) {
@@ -728,7 +724,7 @@ class CollectionTest extends TestCase
 
     public function testSync()
     {
-        $collection = new Collection([1, 2, 3, 4]);
+        $collection = new Collection(1, 2, 3, 4);
         $callback = function ($item) {
             return is_int($item) ? $item * 10 : 'foo';
         };
@@ -764,7 +760,7 @@ class CollectionTest extends TestCase
 
     public function testUnshift()
     {
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
 
         $this->assertSame($collection, $collection->unshift('c'));
         $this->assertSame(['c', 'a', 'b'], $collection->all());
@@ -772,7 +768,7 @@ class CollectionTest extends TestCase
 
     public function testUnshiftMany()
     {
-        $collection = new Collection(['a', 'b']);
+        $collection = new Collection('a', 'b');
         $expected = ['c', 'd', 'e', 'a', 'b'];
 
         $this->assertSame($collection, $collection->unshiftMany(['c', 'd', 'e']));
@@ -782,7 +778,7 @@ class CollectionTest extends TestCase
     public function testWithout()
     {
         $original = ['a', 'b', 'a', 'b'];
-        $collection = new Collection($original);
+        $collection = new Collection(...$original);
         $expected = ['a', 'a'];
         $without = $collection->without('b');
 
@@ -795,14 +791,14 @@ class CollectionTest extends TestCase
     public function testWithoutValueNotContained()
     {
         $expected = ['a', 'b'];
-        $collection = new Collection($expected);
+        $collection = new Collection(...$expected);
 
         $this->assertEquals($collection->all(), $collection->without('c')->all());
     }
 
     public function testWithoutUsingStrict()
     {
-        $collection = new Collection([1, 2, 3]);
+        $collection = new Collection(1, 2, 3);
 
         $this->assertSame([1, 3], $collection->without('2')->all());
         $this->assertSame([1, 2, 3], $collection->without('2', true)->all());
@@ -814,12 +810,12 @@ class CollectionTest extends TestCase
         $expected = ['a', 'b', 'c'];
         $collection = Collection::cast($expected);
 
-        $this->assertEquals(new Collection($expected), $collection);
+        $this->assertEquals(new Collection(...$expected), $collection);
     }
 
     public function testCastCollection()
     {
-        $expected = new Collection(['a', 'b']);
+        $expected = new Collection('a', 'b');
 
         $this->assertSame($expected, Collection::cast($expected));
     }
@@ -834,19 +830,7 @@ class CollectionTest extends TestCase
 
         $collection = Collection::cast($arr);
 
-        $this->assertEquals(new Collection(['a', 'b', 'c']), $collection);
-    }
-
-    public function testCastStdClass()
-    {
-        $obj = new stdClass;
-        $obj->foo = 'a';
-        $obj->bar = 'b';
-        $obj->baz = 'c';
-
-        $collection = Collection::cast($obj);
-
-        $this->assertEquals(new Collection(['a', 'b', 'c']), $collection);
+        $this->assertEquals(new Collection('a', 'b', 'c'), $collection);
     }
 
     public function testCastTraversable()
@@ -854,7 +838,18 @@ class CollectionTest extends TestCase
         $obj = new ArrayObject(['a', 'b', 'c']);
         $collection = Collection::cast($obj);
 
-        $this->assertEquals(new Collection(['a', 'b', 'c']), $collection);
+        $this->assertEquals(new Collection('a', 'b', 'c'), $collection);
+    }
+
+    public function testCastStdClass()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        Collection::cast((object) ['foo' => 'bar']);
+    }
+
+    public function testCreate()
+    {
+        $this->assertEquals(new Collection('a', 'b'), Collection::create('a', 'b'));
     }
 
 }

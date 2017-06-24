@@ -94,6 +94,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `compact`
 * `copy`
 * `count`
+* `create` (static)
 * `filter`
 * `invoke`
 * `itemsAt`
