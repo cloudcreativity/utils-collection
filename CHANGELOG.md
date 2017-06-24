@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Changed
 - Collection constructor now uses variable-length arguments.
 - Collection casting now longer accepts objects unless they are traversable.
+- Collection now implements `IteratorAggregate` rather than `Iterator`.
 
 ### Removed
 - Remove the deprecated `Collection::toArray` method.

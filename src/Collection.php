@@ -18,9 +18,10 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
-use Iterator;
+use IteratorAggregate;
 use OutOfBoundsException;
 use RuntimeException;
 use Traversable;
@@ -30,13 +31,8 @@ use Traversable;
  *
  * @package CloudCreativity\Utils\Collection
  */
-class Collection implements Iterator, Countable
+class Collection implements IteratorAggregate, Countable
 {
-
-    /**
-     * @var integer
-     */
-    private $position = 0;
 
     /**
      * @var array
@@ -55,7 +51,7 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Cast the supplied collection to a Collection object.
+     * Cast the supplied items to a Collection object.
      *
      * If `$collection` is already a Collection, then the same object
      * will be returned. If it is an array or Traversable object, it will be
@@ -88,43 +84,11 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * @return void
+     * @inheritdoc
      */
-    public function rewind()
+    public function getIterator()
     {
-        $this->position = 0;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function current()
-    {
-        return $this->stack[$this->position];
-    }
-
-    /**
-     * @return int
-     */
-    public function key()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @return void
-     */
-    public function next()
-    {
-        ++$this->position;
-    }
-
-    /**
-     * @return bool
-     */
-    public function valid()
-    {
-        return array_key_exists($this->position, $this->stack);
+        return new ArrayIterator($this->stack);
     }
 
     /**
