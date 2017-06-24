@@ -6,6 +6,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 - Collection now has a static `create` method, for fluent construction.
+- Standard iterator now has a static `create` method, for fluent construction.
+- Standard iterator now has a static `cast` method, to cast a value to an instance of the class.
+- Standard iterator interface now has a `copy` method for fluent cloning.
 
 ### Changed
 - Collection constructor now uses variable-length arguments.
@@ -23,6 +26,9 @@ All notable changes to this project will be documented in this file. This projec
   - `contains` and `containsStrict`
   - `equals` and `equalsStrict`
   - `indexOf` and `indexOfStrict`
+- Standard iterator is now longer abstract and now accepts values to its constructor.
+- Standard iterator `first` and `last` methods now return `null` if the collection is empty.
+- Standard iterator functions now accept a `callable` instead of a `Closure`.
 
 ### Removed
 - Remove the deprecated `Collection::toArray` method.

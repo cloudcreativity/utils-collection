@@ -18,7 +18,9 @@
 
 namespace CloudCreativity\Utils\Collection\Tests;
 
+use CloudCreativity\Utils\Collection\StandardIterator;
 use CloudCreativity\Utils\Collection\StandardIteratorInterface;
+use DateTime;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 
@@ -31,18 +33,25 @@ class StandardIteratorTest extends TestCase
 {
 
     /**
-     * @var TestIterator
+     * @var StandardIterator
      */
     private $iterator;
 
     protected function setUp()
     {
-        $this->iterator = new TestIterator(['a', 'b', 'c']);
+        $this->iterator = new StandardIterator('a', 'b', 'c');
     }
 
     public function testIterator()
     {
         $this->assertEquals(['a', 'b', 'c'], iterator_to_array($this->iterator));
+    }
+
+    public function testCreate()
+    {
+        $this->assertEquals($this->iterator, StandardIterator::create('a', 'b', 'c'));
+        $date = new DateTime();
+        $this->assertEquals([$date->format('c')], DateTimeIterator::create($date)->format('c')->all());
     }
 
     public function testImplementsInterface()
@@ -58,22 +67,18 @@ class StandardIteratorTest extends TestCase
     public function testFirst()
     {
         $this->assertSame('a', $this->iterator->first());
-
-        $this->expectException(OutOfBoundsException::class);
-        (new TestIterator())->first();
+        $this->assertNull(StandardIterator::create()->first());
     }
 
     public function testLast()
     {
         $this->assertSame('c', $this->iterator->last());
-
-        $this->expectException(OutOfBoundsException::class);
-        (new TestIterator())->last();
+        $this->assertNull(StandardIterator::create()->last());
     }
 
     public function testFilter()
     {
-        $expected = new TestIterator(['b', 'c']);
+        $expected = new StandardIterator('b', 'c');
 
         $actual = $this->iterator->filter(function ($item, $index) {
             return $item !== 'a' && $index > 0;
@@ -85,7 +90,7 @@ class StandardIteratorTest extends TestCase
 
     public function testReject()
     {
-        $expected = new TestIterator(['a']);
+        $expected = new StandardIterator('a');
 
         $actual = $this->iterator->reject(function ($item, $index) {
             return $item !== 'a' && $index > 0;
@@ -120,17 +125,39 @@ class StandardIteratorTest extends TestCase
     public function testIsEmpty()
     {
         $this->assertFalse($this->iterator->isEmpty());
-        $this->assertTrue((new TestIterator())->isEmpty());
+        $this->assertTrue((new StandardIterator())->isEmpty());
     }
 
     public function testIsNotEmpty()
     {
         $this->assertTrue($this->iterator->isNotEmpty());
-        $this->assertFalse((new TestIterator())->isNotEmpty());
+        $this->assertFalse((new StandardIterator())->isNotEmpty());
     }
 
     public function testCount()
     {
         $this->assertSame(3, $this->iterator->count());
+    }
+
+    public function testCopy()
+    {
+        $actual = $this->iterator->copy();
+
+        $this->assertEquals($this->iterator, $actual);
+        $this->assertNotSame($this->iterator, $actual);
+    }
+
+    public function testCastsItself()
+    {
+        $this->assertSame($this->iterator, StandardIterator::cast($this->iterator));
+    }
+
+    public function testCastUsesStatic()
+    {
+        $dates = new DateTimeIterator($date = new DateTime());
+        $this->assertSame($dates, DateTimeIterator::cast($dates));
+        $other = new StandardIterator($date);
+        $this->assertEquals($dates, DateTimeIterator::cast($other));
+        $this->assertEquals($dates, DateTimeIterator::cast([$date]));
     }
 }
