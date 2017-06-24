@@ -11,9 +11,30 @@ All notable changes to this project will be documented in this file. This projec
 - Collection constructor now uses variable-length arguments.
 - Collection casting now longer accepts objects unless they are traversable.
 - Collection now implements `IteratorAggregate` rather than `Iterator`.
+- Collection object modifiers (e.g. `addObjects`) are now always strict.
+- Collection `replace` method now uses variable-length arguments.
+- Collection methods with strict parameters have been split into two functions:
+  - `add` and `addStrict`
+  - `unique` and `uniqueStrict`
+  - `remove` and `removeStrict`
+  - `without` and `withoutStrict`
+  - `search` and `searchStrict`
+  - `contains` and `containsStrict`
+  - `equals` and `equalsStrict`
+  - `indexOf` and `indexOfStrict`
 
 ### Removed
 - Remove the deprecated `Collection::toArray` method.
+
+### Deprecated
+- The following collection methods are deprecated in preference of methods with variable-length arguments...
+  - `addMany`: use `add` or `addStrict`
+  - `addObject`: use `addObjects`
+  - `pushMany`: use `push`
+  - `pushObject`: use `pushObjects`
+  - `removeMany`: use `remove` or `removeStrict`
+  - `unshiftMany`: use `unshift`
+  - `unshiftObject`: use `unshiftObjects`
 
 ## [0.2.0] - 2017-06-17
 

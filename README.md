@@ -40,24 +40,19 @@ handling numerically indexed lists. It comes with the following methods.
 The following methods modify the list contained within the collection:
 
 * `add`
-* `addMany`
-* `addObject`
+* `addStrict`
 * `addObjects`
 * `clear`
 * `insertAt`
 * `pop`
 * `push`
-* `pushMany`
-* `pushObject`
 * `pushObjects`
 * `remove`
 * `removeAt`
-* `removeMany`
+* `removeStrict`
 * `replace`
 * `shift`
 * `unshift`
-* `unshiftMany`
-* `unshiftObject`
 * `unshiftObjects`
 
 ### Accessors
@@ -76,12 +71,16 @@ collection;
 
 * `any`
 * `contains`
+* `containsStrict`
 * `equals`
+* `equalsStrict`
 * `every`
 * `indexOf`
+* `indexOfStrict`
 * `isEmpty`
 * `isNotEmpty`
 * `search`
+* `searchStrict`
 
 ### Helpers
 
@@ -95,6 +94,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `copy`
 * `count`
 * `create` (static)
+* `each`
 * `filter`
 * `invoke`
 * `itemsAt`
@@ -108,4 +108,6 @@ of the collection. (I.e. the original collection is not modified.)
 * `sort`
 * `sync`
 * `unique`
+* `uniqueStrict`
 * `without`
+* `withoutStrict`

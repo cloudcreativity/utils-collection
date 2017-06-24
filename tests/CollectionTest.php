@@ -25,7 +25,6 @@ use InvalidArgumentException;
 use OutOfBoundsException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use stdClass;
 
 /**
  * Class CollectionTest
@@ -83,15 +82,15 @@ class CollectionTest extends TestCase
      * @param Collection $collection
      * @depends testAdd
      */
-    public function testAddIsStrict(Collection $collection)
+    public function testAddStrict(Collection $collection)
     {
         $expected = $collection->all();
 
         array_push($expected, 10, (string) 10);
 
-        $collection->add(10, true)
-            ->add(10, true)
-            ->add((string) 10, true);
+        $collection->addStrict(10)
+            ->addStrict(10)
+            ->addStrict((string) 10);
 
         $this->assertSame($expected, $collection->all());
     }
@@ -257,6 +256,7 @@ class CollectionTest extends TestCase
         $collection = new Collection('a', '10');
 
         $this->assertTrue($collection->contains('a'));
+        $this->assertTrue($collection->contains('a', 10));
         $this->assertFalse($collection->contains('b'));
 
         return $collection;
@@ -268,8 +268,10 @@ class CollectionTest extends TestCase
      */
     public function testContainsUsingStrict(Collection $collection)
     {
-        $this->assertTrue($collection->contains(10));
-        $this->assertFalse($collection->contains(10, true));
+        $this->assertTrue($collection->containsStrict('10'));
+        $this->assertTrue($collection->containsStrict('10', 'a'));
+        $this->assertFalse($collection->containsStrict(10));
+        $this->assertFalse($collection->containsStrict('a', 10));
     }
 
     public function testCount()
@@ -277,6 +279,30 @@ class CollectionTest extends TestCase
         $arr = ['a', 'b'];
 
         $this->assertSame(count($arr), count(new Collection(...$arr)));
+    }
+
+    public function testEach()
+    {
+        $expected = ['a', 'b', 'c'];
+        $actual = [];
+
+        Collection::create(...$expected)->each(function ($item, $key) use (&$actual) {
+            $actual[$key] = $item;
+        });
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testEachBreaks()
+    {
+        $actual = [];
+
+        Collection::create(1, 2, 3, 4, 5)->each(function ($item) use (&$actual) {
+            $actual[] = $item;
+            return 3 > $item;
+        });
+
+        $this->assertSame([1, 2, 3], $actual);
     }
 
     public function testEquals()
@@ -301,14 +327,14 @@ class CollectionTest extends TestCase
      * @param Collection $collection
      * @depends testEquals
      */
-    public function testEqualsWithStrict(Collection $collection)
+    public function testEqualsStrict(Collection $collection)
     {
         $compare = clone $collection;
         $collection->push('10');
         $compare->push(10);
 
         $this->assertTrue($collection->equals($compare));
-        $this->assertFalse($collection->equals($compare, true));
+        $this->assertFalse($collection->equalsStrict($compare));
     }
 
     public function testEvery()
@@ -347,7 +373,7 @@ class CollectionTest extends TestCase
         $collection = new Collection();
 
         $this->assertNull($collection->first());
-        $collection->replace(['a', 'b']);
+        $collection->replace('a', 'b');
         $this->assertSame('a', $collection->first());
     }
 
@@ -366,12 +392,12 @@ class CollectionTest extends TestCase
      * @param Collection $collection
      * @depends testIndexOf
      */
-    public function testIndexOfUsesStrict(Collection $collection)
+    public function testIndexOfStrict(Collection $collection)
     {
         $collection->push('10');
 
         $this->assertSame(count($collection) - 1, $collection->indexOf(10));
-        $this->assertFalse($collection->indexOf(10, 0, true));
+        $this->assertFalse($collection->indexOfStrict(10, 0));
     }
 
     /**
@@ -488,13 +514,11 @@ class CollectionTest extends TestCase
         $unique = $collection->unique();
         $this->assertNotSame($collection, $unique);
 
-        /** Without strict */
         $expected = ['a', 'b', null, 10];
         $this->assertSame($expected, $unique->all());
 
-        /** With strict */
         $expected = ['a', 'b', null, 10, '10'];
-        $this->assertSame($expected, $collection->unique(true)->all());
+        $this->assertSame($expected, $collection->uniqueStrict()->all());
     }
 
     public function testMap()
@@ -588,15 +612,12 @@ class CollectionTest extends TestCase
         return $collection;
     }
 
-    public function testRemoveUsingStrict()
+    public function testRemoveStrict()
     {
         $collection = new Collection(10, '10');
         $other = $collection->copy();
 
-        $collection->remove(10);
-        $this->assertEmpty($collection->all());
-
-        $other->remove(10, true);
+        $other->removeStrict(10);
         $this->assertSame(['10'], $other->all());
     }
 
@@ -664,8 +685,9 @@ class CollectionTest extends TestCase
         $this->assertFalse($collection->search('c'));
 
         /** Strict */
+        $this->assertFalse($collection->searchStrict('10'));
         $collection->push('10');
-        $this->assertSame(3, $collection->search('10', true));
+        $this->assertSame(3, $collection->searchStrict('10'));
 
         return $collection;
     }
@@ -762,8 +784,8 @@ class CollectionTest extends TestCase
     {
         $collection = new Collection('a', 'b');
 
-        $this->assertSame($collection, $collection->unshift('c'));
-        $this->assertSame(['c', 'a', 'b'], $collection->all());
+        $this->assertSame($collection, $collection->unshift('c', 'd'));
+        $this->assertSame(['c', 'd', 'a', 'b'], $collection->all());
     }
 
     public function testUnshiftMany()
@@ -775,12 +797,22 @@ class CollectionTest extends TestCase
         $this->assertSame($expected, $collection->all());
     }
 
+    public function testUnshiftObjects()
+    {
+        $a = (object) ['foo' => 'bar'];
+        $b = (object) ['baz' => 'bat'];
+        $c = (object) ['foobar' => 'bazbat'];
+
+        $collection = Collection::create($a)->unshiftObjects($b, null, $c);
+        $this->assertSame([$b, $c, $a], $collection->all());
+    }
+
     public function testWithout()
     {
-        $original = ['a', 'b', 'a', 'b'];
+        $original = ['a', 'b', 'a', 'b', 'c'];
         $collection = new Collection(...$original);
         $expected = ['a', 'a'];
-        $without = $collection->without('b');
+        $without = $collection->without('b', 'c');
 
         $this->assertInstanceOf(Collection::class, $without);
         $this->assertNotSame($collection, $without);
@@ -796,13 +828,14 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection->all(), $collection->without('c')->all());
     }
 
-    public function testWithoutUsingStrict()
+    public function testWithoutStrict()
     {
         $collection = new Collection(1, 2, 3);
 
-        $this->assertSame([1, 3], $collection->without('2')->all());
-        $this->assertSame([1, 2, 3], $collection->without('2', true)->all());
-        $this->assertSame([1, 3], $collection->without(2, true)->all());
+        $this->assertSame([1, 2, 3], $collection->withoutStrict('2')->all());
+        $this->assertSame([1, 3], $actual = $collection->withoutStrict(2)->all());
+        $this->assertNotSame($collection, $actual);
+        $this->assertSame([1, 2, 3], $collection->all());
     }
 
     public function testCast()
