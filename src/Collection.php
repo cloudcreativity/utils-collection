@@ -209,18 +209,13 @@ class Collection implements IteratorAggregate, Countable
 
     /**
      * @param $size
-     * @return Collection[]
-     * @todo should this return a collection of collections?
+     * @return Collection
      */
     public function chunk($size)
     {
-        $ret = [];
-
-        foreach (array_chunk($this->stack, $size, false) as $chunk) {
-            $ret[] = new static(...$chunk);
-        }
-
-        return $ret;
+        return self::create(...array_chunk($this->stack, $size, false))->map(function (array $chunk) {
+            return new static(...$chunk);
+        });
     }
 
     /**

@@ -163,16 +163,16 @@ class CollectionTest extends TestCase
         $this->assertEquals([
             new Collection('a', 'b', 'c'),
             new Collection('d'),
-        ], $collection->chunk(3));
+        ], $collection->chunk(3)->all());
 
         $this->assertEquals([
             new Collection('a', 'b'),
             new Collection('c', 'd'),
-        ], $collection->chunk(2));
+        ], $collection->chunk(2)->all());
 
         $this->assertEquals([
             new Collection('a', 'b', 'c', 'd'),
-        ], $collection->chunk(5));
+        ], $collection->chunk(5)->all());
     }
 
     public function testCompact()
