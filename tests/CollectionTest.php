@@ -377,6 +377,19 @@ class CollectionTest extends TestCase
         $this->assertSame('a', $collection->first());
     }
 
+    public function testFirstWithCallback()
+    {
+        $collection = new Collection(1, 2, 3, 4, 5);
+
+        $this->assertSame(3, $collection->first(function ($value, $index) {
+            return 3 === $value && 2 === $index;
+        }));
+
+        $this->assertNull($collection->first(function ($value) {
+            return 5 < $value;
+        }));
+    }
+
     public function testIndexOf()
     {
         $collection = new Collection('a', 'b', 'a');
@@ -485,8 +498,21 @@ class CollectionTest extends TestCase
     {
         $collection = new Collection();
         $this->assertNull($collection->last());
-        $collection->pushMany(['a', 'b']);
+        $collection->push('a', 'b');
         $this->assertSame('b', $collection->last());
+    }
+
+    public function testLastWithCallback()
+    {
+        $collection = new Collection(1, 2, 3, 4, 5);
+
+        $this->assertSame(2, $collection->last(function ($value, $index) {
+            return $value < 3 && $index < 2;
+        }));
+
+        $this->assertNull($collection->last(function ($value) {
+            return is_string($value);
+        }));
     }
 
     public function testIsEmpty()

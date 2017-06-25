@@ -60,7 +60,6 @@ The following methods modify the list contained within the collection:
 The following methods give access to items within the collection:
 
 * `first`
-* `find`
 * `itemAt`
 * `last`
 

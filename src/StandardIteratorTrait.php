@@ -69,19 +69,21 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @param callable|null $callback
      * @return mixed|null
      */
-    public function first()
+    public function first(callable $callback = null)
     {
-        return $this->stack->first();
+        return $this->stack->first($callback);
     }
 
     /**
+     * @param callable|null $callback
      * @return mixed|null
      */
-    public function last()
+    public function last(callable $callback = null)
     {
-        return $this->stack->last();
+        return $this->stack->last($callback);
     }
 
     /**

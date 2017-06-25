@@ -404,9 +404,35 @@ class Collection implements IteratorAggregate, Countable
      * @param callable $callback
      * @return mixed
      *    The matched item or null if no item matches.
+     * @deprecated use `first` instead.
      */
     public function find(callable $callback)
     {
+        return $this->first($callback);
+    }
+
+    /**
+     * Get the first item in the collection, or the first item for which the callback returns true.
+     *
+     * If the callback does not return true for any item in the collection, a
+     * `null` value will be returned instead. The callback should have the
+     * following signature:
+     *
+     * `function($item, $index)`
+     *
+     * Where `$item` is the current item in the iteration and `$index` is the
+     * current index in the iteration.
+     *
+     * @param callable|null $callback
+     * @return mixed
+     *    The first item in the collection or null if the collection is empty.
+     */
+    public function first(callable $callback = null)
+    {
+        if (!$callback) {
+            return count($this->stack) == 0 ? null : $this->stack[0];
+        }
+
         foreach ($this as $key => $value) {
             if (true == call_user_func($callback, $value, $key)) {
                 return $value;
@@ -414,17 +440,6 @@ class Collection implements IteratorAggregate, Countable
         }
 
         return null;
-    }
-
-    /**
-     * Get the first item in the collection.
-     *
-     * @return mixed
-     *    The first item in the collection or null if the collection is empty.
-     */
-    public function first()
-    {
-        return count($this->stack) == 0 ? null : $this->stack[0];
     }
 
     /**
@@ -614,14 +629,29 @@ class Collection implements IteratorAggregate, Countable
     }
 
     /**
-     * Get the last item in the collection.
+     * Get the last item in the collection, or the last one for which the callback returns true.
      *
+     * @param callable|null $callback
      * @return mixed
      *    The last item in the collection or null if the collection is empty.
      */
-    public function last()
+    public function last(callable $callback = null)
     {
-        return !empty($this->stack) ? $this->stack[count($this) - 1] : null;
+        if (!$callback) {
+            return !empty($this->stack) ? $this->stack[count($this) - 1] : null;
+        }
+
+        $key = $this->count() - 1;
+
+        foreach ($this->reverse() as $value) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+
+            $key--;
+        }
+
+        return null;
     }
 
     /**

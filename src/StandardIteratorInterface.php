@@ -53,14 +53,16 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function each(callable $callback);
 
     /**
+     * @param callable|null $callback
      * @return mixed|null
      */
-    public function first();
+    public function first(callable $callback = null);
 
     /**
+     * @param callable|null $callback
      * @return mixed|null
      */
-    public function last();
+    public function last(callable $callback = null);
 
     /**
      * @param callable $callback

@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file. This projec
 
 ### Added
 - Collection now has a static `create` method, for fluent construction.
+- Can now pass a callback to collection `first` and `last` methods.
 - Standard iterator now has a static `create` method, for fluent construction.
 - Standard iterator now has a static `cast` method, to cast a value to an instance of the class.
 - Standard iterator interface now has the following methods: 
@@ -45,6 +46,7 @@ All notable changes to this project will be documented in this file. This projec
   - `removeMany`: use `remove` or `removeStrict`
   - `unshiftMany`: use `unshift`
   - `unshiftObject`: use `unshiftObjects`
+- The collection `find` method is deprecated in favour of `first`.
 
 ## [0.2.0] - 2017-06-17
 
