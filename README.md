@@ -26,8 +26,8 @@ Make sure your IDE has an [EditorConfig](http://editorconfig.org) plugin install
 Clone the repository, then:
 
 ``` bash
-composer install
-bin/phpunit
+composer up
+vendor/bin/phpunit
 ```
 
 ## Collection
