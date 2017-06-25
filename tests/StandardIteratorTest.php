@@ -184,4 +184,16 @@ class StandardIteratorTest extends TestCase
         $this->assertEquals($dates, DateTimeIterator::cast($other));
         $this->assertEquals($dates, DateTimeIterator::cast([$date]));
     }
+
+    public function testTap()
+    {
+        $tapped = null;
+
+        $actual = $this->iterator->tap(function (StandardIterator $tap) use (&$tapped) {
+            $this->assertNotSame($this->iterator, $tap);
+            $tapped = $tap->take(2);
+        });
+
+        $this->assertSame(['a', 'b'], $tapped->all());
+    }
 }

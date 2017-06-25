@@ -138,6 +138,29 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @param $amount
+     * @return StandardIteratorTrait
+     */
+    public function take($amount)
+    {
+        $copy = clone $this;
+        $copy->stack = $copy->stack->take($amount);
+
+        return $copy;
+    }
+
+    /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback($this->copy());
+
+        return $this;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty()

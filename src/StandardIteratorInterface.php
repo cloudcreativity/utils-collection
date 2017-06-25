@@ -95,6 +95,18 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function map(callable $callback);
 
     /**
+     * @param $amount
+     * @return static
+     */
+    public function take($amount);
+
+    /**
+     * @param callable $callback
+     * @return static
+     */
+    public function tap(callable $callback);
+
+    /**
      * @return bool
      */
     public function isEmpty();
