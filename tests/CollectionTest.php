@@ -815,6 +815,20 @@ class CollectionTest extends TestCase
         $this->assertSame($original, $collection->all());
     }
 
+    public function testTap()
+    {
+        $tapped = null;
+
+        $actual = Collection::create(...$expected = [1, 2, 3, 4, 5])
+            ->tap(function (Collection $collection) use (&$tapped) {
+                $tapped = $collection->push(6);
+            })
+            ->all();
+
+        $this->assertSame($expected, $actual, 'Original collection is not modified');
+        $this->assertSame([1, 2, 3, 4, 5, 6], $tapped->all());
+    }
+
     public function testUnshift()
     {
         $collection = new Collection('a', 'b');

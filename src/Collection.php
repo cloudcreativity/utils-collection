@@ -1049,6 +1049,14 @@ class Collection implements IteratorAggregate, Countable
         return $collection;
     }
 
+    /**
+     * Return a new collection limited to the amount of items specified.
+     *
+     * If the number of items is negative, will take from the end of the collection.
+     *
+     * @param $amount
+     * @return Collection
+     */
     public function take($amount)
     {
         if ($amount < 0) {
@@ -1056,6 +1064,19 @@ class Collection implements IteratorAggregate, Countable
         }
 
         return $this->slice(0, $amount);
+    }
+
+    /**
+     * Tap into the collection without being able to modify it.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback($this->copy());
+
+        return $this;
     }
 
     /**
