@@ -18,6 +18,7 @@
 
 namespace CloudCreativity\Utils\Collection\Tests;
 
+use CloudCreativity\Utils\Collection\Collection;
 use CloudCreativity\Utils\Collection\StandardIterator;
 use CloudCreativity\Utils\Collection\StandardIteratorInterface;
 use DateTime;
@@ -145,6 +146,29 @@ class StandardIteratorTest extends TestCase
 
         $this->assertEquals($this->iterator, $actual);
         $this->assertNotSame($this->iterator, $actual);
+    }
+
+    public function testMap()
+    {
+        $actual = $this->iterator->map(function ($item) {
+            return $item . $item;
+        });
+
+        $this->assertInstanceOf(Collection::class, $actual);
+        $this->assertSame(['aa', 'bb', 'cc'], $actual->all());
+        $this->assertSame(['a', 'b', 'c'], $this->iterator->all());
+    }
+
+    public function testEach()
+    {
+        $expected = new DateTime('2017-05-18 12:00:00');
+        $dates = new DateTimeIterator(new DateTime());
+
+        $dates->each(function (DateTime $date) use ($expected) {
+            $date->setTimestamp($expected->getTimestamp());
+        });
+
+        $this->assertEquals([$expected], $dates->all());
     }
 
     public function testCastsItself()

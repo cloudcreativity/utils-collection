@@ -355,7 +355,6 @@ class Collection implements IteratorAggregate, Countable
     public function every(callable $callback)
     {
         foreach ($this as $key => $value) {
-
             if (true != call_user_func($callback, $value, $key)) {
                 return false;
             }

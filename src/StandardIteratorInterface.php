@@ -47,6 +47,12 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function collect();
 
     /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function each(callable $callback);
+
+    /**
      * @return mixed|null
      */
     public function first();
@@ -79,6 +85,12 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
      * @return bool
      */
     public function any(callable $callback);
+
+    /**
+     * @param callable $callback
+     * @return Collection
+     */
+    public function map(callable $callback);
 
     /**
      * @return bool

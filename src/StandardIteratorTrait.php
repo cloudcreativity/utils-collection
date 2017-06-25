@@ -58,6 +58,17 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @param callable $callable
+     * @return $this
+     */
+    public function each(callable $callable)
+    {
+        $this->stack->each($callable);
+
+        return $this;
+    }
+
+    /**
      * @return mixed|null
      */
     public function first()
@@ -113,6 +124,15 @@ trait StandardIteratorTrait
     public function any(callable $callback)
     {
         return $this->stack->any($callback);
+    }
+
+    /**
+     * @param callable $callable
+     * @return Collection
+     */
+    public function map(callable $callable)
+    {
+        return $this->stack->map($callable);
     }
 
     /**

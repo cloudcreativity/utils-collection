@@ -8,7 +8,10 @@ All notable changes to this project will be documented in this file. This projec
 - Collection now has a static `create` method, for fluent construction.
 - Standard iterator now has a static `create` method, for fluent construction.
 - Standard iterator now has a static `cast` method, to cast a value to an instance of the class.
-- Standard iterator interface now has a `copy` method for fluent cloning.
+- Standard iterator interface now has the following methods: 
+  - `copy` for fluent cloning.
+  - `map` for mapping the iterator to a generic collection.
+  - `each` for fluent iterating.
 
 ### Changed
 - Collection constructor now uses variable-length arguments.
