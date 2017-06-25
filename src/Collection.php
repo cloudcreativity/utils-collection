@@ -1049,6 +1049,15 @@ class Collection implements IteratorAggregate, Countable
         return $collection;
     }
 
+    public function take($amount)
+    {
+        if ($amount < 0) {
+            return $this->slice($amount, abs($amount));
+        }
+
+        return $this->slice(0, $amount);
+    }
+
     /**
      * Returns a new collection containing only unique values within this collection.
      *

@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 - Collection now has a static `create` method, for fluent construction.
 - Can now pass a callback to collection `first` and `last` methods.
+- New collection methods:
+  - `take`
 - Standard iterator now has a static `create` method, for fluent construction.
 - Standard iterator now has a static `cast` method, to cast a value to an instance of the class.
 - Standard iterator interface now has the following methods: 

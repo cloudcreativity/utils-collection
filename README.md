@@ -106,6 +106,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `slice`
 * `sort`
 * `sync`
+* `take`
 * `unique`
 * `uniqueStrict`
 * `without`

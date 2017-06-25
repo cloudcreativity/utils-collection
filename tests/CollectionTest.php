@@ -806,6 +806,15 @@ class CollectionTest extends TestCase
         })->all());
     }
 
+    public function testTake()
+    {
+        $collection = new Collection(...$original = [1, 2, 3, 4, 5]);
+
+        $this->assertSame([1, 2], $collection->take(2)->all());
+        $this->assertSame([4, 5], $collection->take(-2)->all());
+        $this->assertSame($original, $collection->all());
+    }
+
     public function testUnshift()
     {
         $collection = new Collection('a', 'b');
