@@ -18,22 +18,48 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+use Traversable;
+
 /**
  * Class AbstractStandardIterator
  *
  * @package CloudCreativity\Utils\Collection
  */
-abstract class AbstractStandardIterator implements StandardIteratorInterface
+class StandardIterator implements StandardIteratorInterface
 {
 
     use StandardIteratorTrait;
 
     /**
-     * AbstractStandardIterator constructor.
+     * @param array ...$items
+     * @return static
      */
-    public function __construct()
+    public static function create(...$items)
     {
-        $this->stack = new Collection();
+        return new static(...$items);
+    }
+
+    /**
+     * @param StandardIterator|array|Traversable $items
+     * @return static
+     */
+    public static function cast($items)
+    {
+        if ($items instanceof static) {
+            return $items;
+        }
+
+        return new static(...$items);
+    }
+
+    /**
+     * StandardIterator constructor.
+     *
+     * @param array ...$items
+     */
+    public function __construct(...$items)
+    {
+        $this->stack = new Collection(...$items);
     }
 
     /**

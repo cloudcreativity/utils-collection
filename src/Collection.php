@@ -18,12 +18,12 @@
 
 namespace CloudCreativity\Utils\Collection;
 
+use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
-use Iterator;
+use IteratorAggregate;
 use OutOfBoundsException;
 use RuntimeException;
-use stdClass;
 use Traversable;
 
 /**
@@ -31,88 +31,93 @@ use Traversable;
  *
  * @package CloudCreativity\Utils\Collection
  */
-class Collection implements Iterator, Countable
+class Collection implements IteratorAggregate, Countable
 {
-
-    /**
-     * @var integer
-     */
-    private $position = 0;
 
     /**
      * @var array
      */
-    private $stack = [];
+    private $stack;
+
+    /**
+     * Fluent constructor.
+     *
+     * @param array ...$items
+     * @return Collection
+     */
+    public static function create(...$items)
+    {
+        return new self(...$items);
+    }
+
+    /**
+     * Cast the supplied items to a Collection object.
+     *
+     * If `$collection` is already a Collection, then the same object
+     * will be returned. If it is an array or Traversable object, it will be
+     * converted to a Collection object.
+     *
+     * @param self|array|Traversable $items
+     * @return Collection
+     */
+    public static function cast($items)
+    {
+        if ($items instanceof static) {
+            return $items;
+        } elseif (is_array($items)) {
+            return new self(...array_values($items));
+        } elseif ($items instanceof Traversable) {
+            return new self(...$items);
+        }
+
+        throw new InvalidArgumentException('Cannot cast provided value to a collection.');
+    }
 
     /**
      * Collection constructor.
      *
-     * @param array $items
+     * @param array ...$items
      */
-    public function __construct($items = [])
+    public function __construct(...$items)
     {
-        if ($items instanceof static) {
-            $items = $items->toArray();
-        } elseif (is_array($items)) {
-            $items = array_values($items);
-        } else {
-            throw new InvalidArgumentException('Expecting an array or a Collection object.');
-        }
-
         $this->stack = $items;
     }
 
     /**
-     * @return void
+     * @inheritdoc
      */
-    public function rewind()
+    public function getIterator()
     {
-        $this->position = 0;
-    }
-
-    /**
-     * @return mixed
-     */
-    public function current()
-    {
-        return $this->stack[$this->position];
-    }
-
-    /**
-     * @return int
-     */
-    public function key()
-    {
-        return $this->position;
-    }
-
-    /**
-     * @return void
-     */
-    public function next()
-    {
-        ++$this->position;
-    }
-
-    /**
-     * @return bool
-     */
-    public function valid()
-    {
-        return array_key_exists($this->position, $this->stack);
+        return new ArrayIterator($this->stack);
     }
 
     /**
      * Adds the item if it is not already in the collection.
      *
-     * @param mixed $item
-     * @param bool $strict
+     * @param array ...$items
      * @return $this
      */
-    public function add($item, $strict = false)
+    public function add(...$items)
     {
-        if (!in_array($item, $this->stack, $strict)) {
-            $this->push($item);
+        foreach ($items as $item) {
+            if (!in_array($item, $this->stack)) {
+                $this->push($item);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param array ...$items
+     * @return $this
+     */
+    public function addStrict(...$items)
+    {
+        foreach ($items as $item) {
+            if (!in_array($item, $this->stack, true)) {
+                $this->push($item);
+            }
         }
 
         return $this;
@@ -124,11 +129,14 @@ class Collection implements Iterator, Countable
      * @param array|Traversable $items
      * @param bool $strict
      * @return $this
+     * @deprecated use `add` or `addStrict`
      */
     public function addMany($items, $strict = false)
     {
-        foreach ($this->cast($items) as $item) {
-            $this->add($item, $strict);
+        if ($strict) {
+            $this->addStrict(...$items);
+        } else {
+            $this->add(...$items);
         }
 
         return $this;
@@ -138,14 +146,12 @@ class Collection implements Iterator, Countable
      * Add an item if it is an object and is not already in the collection.
      *
      * @param mixed $object
-     * @param bool $strict
      * @return $this
+     * @deprecated use `addObjects`
      */
-    public function addObject($object, $strict = false)
+    public function addObject($object)
     {
-        if (is_object($object)) {
-            $this->add($object, $strict);
-        }
+        $this->addObjects($object);
 
         return $this;
     }
@@ -153,14 +159,15 @@ class Collection implements Iterator, Countable
     /**
      * Adds any items that are an object and not already in the collection.
      *
-     * @param array|Traversable $objects
-     * @param bool $strict
+     * @param array ...$objects
      * @return $this
      */
-    public function addObjects($objects, $strict = false)
+    public function addObjects(...$objects)
     {
-        foreach ($this->cast($objects) as $object) {
-            $this->addObject($object);
+        foreach ($objects as $object) {
+            if (is_object($object)) {
+                $this->addStrict($object);
+            }
         }
 
         return $this;
@@ -202,18 +209,13 @@ class Collection implements Iterator, Countable
 
     /**
      * @param $size
-     * @return Collection[]
-     * @todo should this return a collection of collections?
+     * @return Collection
      */
     public function chunk($size)
     {
-        $ret = [];
-
-        foreach (array_chunk($this->stack, $size, false) as $chunk) {
-            $ret[] = new static($chunk);
-        }
-
-        return $ret;
+        return self::create(...array_chunk($this->stack, $size, false))->map(function (array $chunk) {
+            return new static(...$chunk);
+        });
     }
 
     /**
@@ -241,15 +243,29 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Returns true if the supplied item is found within the collection.
+     * Returns true if all the supplied items are found within the collection.
      *
-     * @param mixed $item
-     * @param bool $strict
+     * @param array ...$items
      * @return boolean
      */
-    public function contains($item, $strict = false)
+    public function contains(...$items)
     {
-        return false !== $this->search($item, $strict);
+        return self::create(...$items)->every(function ($item) {
+            return in_array($item, $this->stack);
+        });
+    }
+
+    /**
+     * Returns true if all the supplied items are found within the collection, using strict comparison.
+     *
+     * @param array ...$items
+     * @return boolean
+     */
+    public function containsStrict(...$items)
+    {
+        return self::create(...$items)->every(function ($item) {
+            return in_array($item, $this->stack, true);
+        });
     }
 
     /**
@@ -278,6 +294,21 @@ class Collection implements Iterator, Countable
     }
 
     /**
+     * @param callable $callback
+     * @return $this
+     */
+    public function each(callable $callback)
+    {
+        foreach ($this as $key => $item) {
+            if (false === $callback($item, $key)) {
+                break;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns true if the supplied collection is equal to the current collection.
      *
      * This method returns true if the collection within `$compare` is the same
@@ -285,16 +316,26 @@ class Collection implements Iterator, Countable
      * `$object` is not factored in.
      *
      * @param array|Traversable $compare
-     * @param bool $strict
      * @return bool
      */
-    public function equals($compare, $strict = false)
+    public function equals($compare)
     {
-        $compare = $this->cast($compare);
+        return $this->stack == self::cast($compare)->stack;
+    }
 
-        return (false == $strict) ?
-            $this->stack == $compare->stack :
-            $this->stack === $compare->stack;
+    /**
+     * Returns true if the supplied collection is equal to the current collection, using strict comparison.
+     *
+     * This method returns true if the collection within `$compare` is the same
+     * as the collection within this collection. The class of `$this` and
+     * `$object` is not factored in.
+     *
+     * @param $compare
+     * @return bool
+     */
+    public function equalsStrict($compare)
+    {
+        return $this->stack === self::cast($compare)->stack;
     }
 
     /**
@@ -314,7 +355,6 @@ class Collection implements Iterator, Countable
     public function every(callable $callback)
     {
         foreach ($this as $key => $value) {
-
             if (true != call_user_func($callback, $value, $key)) {
                 return false;
             }
@@ -364,9 +404,35 @@ class Collection implements Iterator, Countable
      * @param callable $callback
      * @return mixed
      *    The matched item or null if no item matches.
+     * @deprecated use `first` instead.
      */
     public function find(callable $callback)
     {
+        return $this->first($callback);
+    }
+
+    /**
+     * Get the first item in the collection, or the first item for which the callback returns true.
+     *
+     * If the callback does not return true for any item in the collection, a
+     * `null` value will be returned instead. The callback should have the
+     * following signature:
+     *
+     * `function($item, $index)`
+     *
+     * Where `$item` is the current item in the iteration and `$index` is the
+     * current index in the iteration.
+     *
+     * @param callable|null $callback
+     * @return mixed
+     *    The first item in the collection or null if the collection is empty.
+     */
+    public function first(callable $callback = null)
+    {
+        if (!$callback) {
+            return count($this->stack) == 0 ? null : $this->stack[0];
+        }
+
         foreach ($this as $key => $value) {
             if (true == call_user_func($callback, $value, $key)) {
                 return $value;
@@ -374,17 +440,6 @@ class Collection implements Iterator, Countable
         }
 
         return null;
-    }
-
-    /**
-     * Get the first item in the collection.
-     *
-     * @return mixed
-     *    The first item in the collection or null if the collection is empty.
-     */
-    public function first()
-    {
-        return count($this->stack) == 0 ? null : $this->stack[0];
     }
 
     /**
@@ -401,23 +456,53 @@ class Collection implements Iterator, Countable
      *     The item being searched against.
      * @param integer $startAt
      *     The index in the collection to start searching from.
-     * @param bool $strict
      * @return integer|false
      *     The integer index in the array, or false if no matches.
      * @throws OutOfBoundsException
      *     If `$startAt` is out of bounds.
      */
-    public function indexOf($item, $startAt = 0, $strict = false)
+    public function indexOf($item, $startAt = 0)
     {
         if (count($this) <= $startAt) {
             throw new OutOfBoundsException(sprintf('Index "%s" is out of bounds.', $startAt));
         }
 
         for ($i = $startAt; $i < count($this->stack); $i++) {
+            if ($item == $this->stack[$i]) {
+                return $i;
+            }
+        }
 
-            $value = $this->stack[$i];
+        return false;
+    }
 
-            if ((!$strict && $item == $value) || ($strict && $item === $value)) {
+    /**
+     * Returns the index of the first matching item in the collection, using strict comparison.
+     *
+     * This method returns the index of the first item in the collection that
+     * matches the supplied item. If no matches are found, a `false` boolean
+     * will be returned.
+     *
+     * If `$startAt` is provided, the search for a matching item will begin at
+     * the `$startAt` index in the array.
+     *
+     * @param mixed $item
+     *     The item being searched against.
+     * @param integer $startAt
+     *     The index in the collection to start searching from.
+     * @return integer|false
+     *     The integer index in the array, or false if no matches.
+     * @throws OutOfBoundsException
+     *     If `$startAt` is out of bounds.
+     */
+    public function indexOfStrict($item, $startAt = 0)
+    {
+        if (count($this) <= $startAt) {
+            throw new OutOfBoundsException(sprintf('Index "%s" is out of bounds.', $startAt));
+        }
+
+        for ($i = $startAt; $i < count($this->stack); $i++) {
+            if ($item === $this->stack[$i]) {
                 return $i;
             }
         }
@@ -528,30 +613,41 @@ class Collection implements Iterator, Countable
      * exist in the collection. The new collection will have its values in the
      * order that the indexes were requested.
      *
-     * @param array $indexes
+     * @param array ...$indexes
      * @return Collection
      *    the new collection containing only the values of the requested indexes.
      */
-    public function itemsAt(array $indexes)
+    public function itemsAt(...$indexes)
     {
-        $collection = new static();
-
-        foreach ($indexes as $index) {
-            $collection->push($this->itemAt($index));
-        }
-
-        return $collection;
+        return self::create(...$indexes)->map(function ($index) {
+            return $this->itemAt($index);
+        });
     }
 
     /**
-     * Get the last item in the collection.
+     * Get the last item in the collection, or the last one for which the callback returns true.
      *
+     * @param callable|null $callback
      * @return mixed
      *    The last item in the collection or null if the collection is empty.
      */
-    public function last()
+    public function last(callable $callback = null)
     {
-        return !empty($this->stack) ? $this->stack[count($this) - 1] : null;
+        if (!$callback) {
+            return !empty($this->stack) ? $this->stack[count($this) - 1] : null;
+        }
+
+        $key = $this->count() - 1;
+
+        foreach ($this->reverse() as $value) {
+            if ($callback($value, $key)) {
+                return $value;
+            }
+
+            $key--;
+        }
+
+        return null;
     }
 
     /**
@@ -586,12 +682,11 @@ class Collection implements Iterator, Countable
      *
      * @param $size
      * @param mixed|null $value
-     * @return static
+     * @return Collection
      */
     public function pad($size, $value = null)
     {
         $collection = new static();
-
         $collection->stack = array_pad($this->stack, $size, $value);
 
         return $collection;
@@ -611,12 +706,14 @@ class Collection implements Iterator, Countable
     /**
      * Adds the supplied item to the end of the collection.
      *
-     * @param mixed $item
+     * @param array ...$items
      * @return $this
      */
-    public function push($item)
+    public function push(...$items)
     {
-        $this->stack[] = $item;
+        foreach ($items as $item) {
+            $this->stack[] = $item;
+        }
 
         return $this;
     }
@@ -627,12 +724,11 @@ class Collection implements Iterator, Countable
      * @param array|Traversable
      *     the items to be added.
      * @return $this
+     * @deprecated use `push` instead
      */
     public function pushMany($items)
     {
-        foreach ($this->cast($items) as $value) {
-            $this->push($value);
-        }
+        $this->push(...$items);
 
         return $this;
     }
@@ -642,12 +738,11 @@ class Collection implements Iterator, Countable
      *
      * @param mixed $object
      * @return $this
+     * @deprecated use `pushObjects` instead
      */
     public function pushObject($object)
     {
-        if (is_object($object)) {
-            $this->push($object);
-        }
+        $this->pushObjects($object);
 
         return $this;
     }
@@ -655,14 +750,14 @@ class Collection implements Iterator, Countable
     /**
      * Add any items that are objects to the collection.
      *
-     * @param array|Traversable $object
+     * @param array ...$objects
      * @return $this
      */
-    public function pushObjects($objects)
+    public function pushObjects(...$objects)
     {
-        foreach ($this->cast($objects) as $object) {
+        foreach ($objects as $object) {
             if (is_object($object)) {
-                $this->pushObject($object);
+                $this->stack[] = $object;
             }
         }
 
@@ -730,24 +825,17 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Removes all instances of the supplied item from this collection.
+     * Removes all instances of the supplied items from this collection.
      *
-     * @param mixed $item
-     *    The item to remove.
-     * @param bool $strict
+     * @param array ...$items
+     *    The items to remove.
      * @return $this
      */
-    public function remove($item, $strict = false)
+    public function remove(...$items)
     {
-        $stack = [];
-
-        foreach ($this as $value) {
-            if (($strict && $item !== $value) || (!$strict && $item != $value)) {
-                $stack[] = $value;
-            }
-        }
-
-        $this->stack = $stack;
+        $this->stack = $this->reject(function ($item) use ($items) {
+            return in_array($item, $items);
+        })->all();
 
         return $this;
     }
@@ -781,29 +869,36 @@ class Collection implements Iterator, Countable
     }
 
     /**
+     * Removes all instances of the supplied items from this collection using strict comparison.
+     *
+     * @param array ...$items
+     * @return $this
+     */
+    public function removeStrict(...$items)
+    {
+        $this->stack = $this->reject(function ($item) use ($items) {
+            return in_array($item, $items, true);
+        })->all();
+
+        return $this;
+    }
+
+    /**
      * Removes all instances of the supplied items from the collection.
      *
      * @param array|Traversable $items
      *    The items to remove.
      * @param bool $strict
      * @return $this
+     * @deprecated use `remove` or `removeStrict`
      */
     public function removeMany($items, $strict = false)
     {
-        $stack = [];
-
-        if (!is_array($items)) {
-            $items = $this->cast($items)->toArray();
+        if ($strict) {
+            $this->removeStrict(...$items);
+        } else {
+            $this->remove(...$items);
         }
-
-        foreach ($this as $value) {
-
-            if (!in_array($value, $items, $strict)) {
-                $stack[] = $value;
-            }
-        }
-
-        $this->stack = $stack;
 
         return $this;
     }
@@ -811,12 +906,12 @@ class Collection implements Iterator, Countable
     /**
      * Replace the collection with the supplied items.
      *
-     * @param array|Traversable $items
+     * @param array ...$items
      * @return $this
      */
-    public function replace($items)
+    public function replace(...$items)
     {
-        $this->stack = $this->cast($items)->toArray();
+        $this->stack = $items;
 
         return $this;
     }
@@ -841,7 +936,6 @@ class Collection implements Iterator, Countable
     public function reverse()
     {
         $collection = new static();
-
         $collection->stack = array_reverse($this->stack);
 
         return $collection;
@@ -851,13 +945,24 @@ class Collection implements Iterator, Countable
      * Searches for the supplied item and returns the corresponding key if successful.
      *
      * @param mixed $item
-     * @param bool $strict
      * @return integer|false
      *    The integer key if found, or false if not found.
      */
-    public function search($item, $strict = false)
+    public function search($item)
     {
-        return array_search($item, $this->stack, $strict);
+        return array_search($item, $this->stack);
+    }
+
+    /**
+     * Searches for the supplied item using strict comparison and returns the corresponding key if successful.
+     *
+     * @param $item
+     * @return integer|false
+     *    The integer key if found, or false if not found.
+     */
+    public function searchStrict($item)
+    {
+        return array_search($item, $this->stack, true);
     }
 
     /**
@@ -889,7 +994,6 @@ class Collection implements Iterator, Countable
     public function slice($begin, $end = null)
     {
         $collection = new static();
-
         $collection->stack = array_slice($this->stack, $begin, $end, false);
 
         return $collection;
@@ -916,10 +1020,7 @@ class Collection implements Iterator, Countable
      */
     public function sort(callable $callback)
     {
-        $collection = new static();
-
-        $collection->stack = $this->stack;
-
+        $collection = clone $this;
         usort($collection->stack, $callback);
 
         return $collection;
@@ -949,30 +1050,62 @@ class Collection implements Iterator, Countable
     }
 
     /**
-     * Return an array copy of this collection.
+     * Return a new collection limited to the amount of items specified.
      *
-     * @return array
-     * @deprecated use `all` instead.
+     * If the number of items is negative, will take from the end of the collection.
+     *
+     * @param $amount
+     * @return Collection
      */
-    public function toArray()
+    public function take($amount)
     {
-        return $this->all();
+        if ($amount < 0) {
+            return $this->slice($amount, abs($amount));
+        }
+
+        return $this->slice(0, $amount);
+    }
+
+    /**
+     * Tap into the collection without being able to modify it.
+     *
+     * @param callable $callback
+     * @return $this
+     */
+    public function tap(callable $callback)
+    {
+        $callback($this->copy());
+
+        return $this;
     }
 
     /**
      * Returns a new collection containing only unique values within this collection.
      *
-     * @param bool $strict
+     * @param $flags
      * @return Collection
      *    The new collection containing only unique values.
      */
-    public function unique($strict = false)
+    public function unique($flags = SORT_STRING)
+    {
+        $collection = new static();
+        $collection->stack = array_values(array_unique($this->stack, $flags));
+
+        return $collection;
+    }
+
+    /**
+     * Returns a new collection containing only unique values, using strict comparison.
+     *
+     * @return Collection
+     */
+    public function uniqueStrict()
     {
         $collection = new static();
 
-        foreach ($this as $value) {
-            $collection->add($value, $strict);
-        }
+        $this->each(function ($item) use ($collection) {
+            $collection->addStrict($item);
+        });
 
         return $collection;
     }
@@ -980,13 +1113,13 @@ class Collection implements Iterator, Countable
     /**
      * Adds the supplied item to the start of the collection.
      *
-     * @param mixed $item
-     *    The item to be added.
+     * @param array ...$items
+     *    The items to be added.
      * @return $this
      */
-    public function unshift($item)
+    public function unshift(...$items)
     {
-        array_unshift($this->stack, $item);
+        $this->stack = array_merge($items, $this->stack);
 
         return $this;
     }
@@ -997,10 +1130,11 @@ class Collection implements Iterator, Countable
      * @param array|Traversable $items
      *    The items to be added to the start.
      * @return $this
+     * @deprecated use `unshift`
      */
     public function unshiftMany($items)
     {
-        $this->stack = array_merge($this->cast($items)->toArray(), $this->stack);
+        $this->unshift(...$items);
 
         return $this;
     }
@@ -1010,12 +1144,11 @@ class Collection implements Iterator, Countable
      *
      * @param mixed $object
      * @return $this
+     * @deprecated use `unshiftObjects`
      */
     public function unshiftObject($object)
     {
-        if (is_object($object)) {
-            $this->unshift($object);
-        }
+        $this->unshiftObjects($object);
 
         return $this;
     }
@@ -1023,60 +1156,41 @@ class Collection implements Iterator, Countable
     /**
      * Add items that are objects to the start of the collection.
      *
-     * @param array|Traversable
+     * @param array ...$objects
      * @return $this
      */
-    public function unshiftObjects($objects)
+    public function unshiftObjects(...$objects)
     {
-        foreach ($this->cast($objects) as $object) {
-            $this->unshift($object);
-        }
+        $objects = self::create(...$objects)->filter(function ($object) {
+            return is_object($object);
+        })->all();
+
+        $this->stack = array_merge($objects, $this->stack);
 
         return $this;
     }
 
     /**
-     * Returns a new collection containing all values except the one provided.
+     * Returns a new collection containing all values except those provided.
      *
-     * @param mixed $item
-     *    The item that should not be included.
-     * @param bool $strict
+     * @param array ...$items
+     *    The items that should not be included.
      * @return Collection
      *    The new collection of values that do not match the provided value.
      */
-    public function without($item, $strict = false)
+    public function without(...$items)
     {
-        return $this->filter(function ($value) use ($item, $strict) {
-            return ($strict && $item !== $value) || (!$strict && $item != $value);
-        });
+        return $this->copy()->remove(...$items);
     }
 
     /**
-     * Cast the supplied collection to a Collection object.
+     * Returns a new collection containing all values except those provided, using strict comparison.
      *
-     * If `$collection` is already a Collection, then the same object
-     * will be returned. If it is an array or Traversable object, it will be
-     * converted to a Collection object.
-     *
-     * @param array|Traversable
+     * @param array ...$items
      * @return Collection
      */
-    public static function cast($items)
+    public function withoutStrict(...$items)
     {
-        if ($items instanceof static) {
-            return $items;
-        } elseif (is_array($items) || $items instanceof self) {
-            return new static($items);
-        } elseif (!$items instanceof Traversable && !$items instanceof stdClass) {
-            throw new InvalidArgumentException('Expecting a Traversable object or an array.');
-        }
-
-        $cast = new static();
-
-        foreach ($items as $value) {
-            $cast->push($value);
-        }
-
-        return $cast;
+        return $this->copy()->removeStrict(...$items);
     }
 }

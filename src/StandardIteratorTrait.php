@@ -18,9 +18,6 @@
 
 namespace CloudCreativity\Utils\Collection;
 
-use Closure;
-use OutOfBoundsException;
-
 /**
  * Trait StandardIteratorTrait
  *
@@ -43,6 +40,16 @@ trait StandardIteratorTrait
     }
 
     /**
+     * Fluent clone.
+     *
+     * @return static
+     */
+    public function copy()
+    {
+        return clone $this;
+    }
+
+    /**
      * @return Collection
      */
     public function collect()
@@ -51,38 +58,39 @@ trait StandardIteratorTrait
     }
 
     /**
-     * @return mixed
-     * @throws OutOfBoundsException
-     *      if the collection is empty.
+     * @param callable $callable
+     * @return $this
      */
-    public function first()
+    public function each(callable $callable)
     {
-        if ($this->isEmpty()) {
-            throw new OutOfBoundsException('No items.');
-        }
+        $this->stack->each($callable);
 
-        return $this->stack->first();
+        return $this;
     }
 
     /**
-     * @return mixed
-     * @throws OutOfBoundsException
-     *      if the collection is empty.
+     * @param callable|null $callback
+     * @return mixed|null
      */
-    public function last()
+    public function first(callable $callback = null)
     {
-        if ($this->isEmpty()) {
-            throw new OutOfBoundsException('No items.');
-        }
-
-        return $this->stack->last();
+        return $this->stack->first($callback);
     }
 
     /**
-     * @param Closure $callback
+     * @param callable|null $callback
+     * @return mixed|null
+     */
+    public function last(callable $callback = null)
+    {
+        return $this->stack->last($callback);
+    }
+
+    /**
+     * @param callable $callback
      * @return static
      */
-    public function filter(Closure $callback)
+    public function filter(callable $callback)
     {
         $filtered = new static();
         $filtered->stack = $this->stack->filter($callback);
@@ -91,10 +99,10 @@ trait StandardIteratorTrait
     }
 
     /**
-     * @param Closure $callback
+     * @param callable $callback
      * @return static
      */
-    public function reject(Closure $callback)
+    public function reject(callable $callback)
     {
         $filtered = new static();
         $filtered->stack = $this->stack->reject($callback);
@@ -103,21 +111,30 @@ trait StandardIteratorTrait
     }
 
     /**
-     * @param Closure $callback
+     * @param callable $callback
      * @return bool
      */
-    public function every(Closure $callback)
+    public function every(callable $callback)
     {
         return $this->stack->every($callback);
     }
 
     /**
-     * @param Closure $callback
+     * @param callable $callback
      * @return bool
      */
-    public function any(Closure $callback)
+    public function any(callable $callback)
     {
         return $this->stack->any($callback);
+    }
+
+    /**
+     * @param callable $callable
+     * @return Collection
+     */
+    public function map(callable $callable)
+    {
+        return $this->stack->map($callable);
     }
 
     /**

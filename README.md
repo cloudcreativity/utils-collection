@@ -26,8 +26,8 @@ Make sure your IDE has an [EditorConfig](http://editorconfig.org) plugin install
 Clone the repository, then:
 
 ``` bash
-composer install
-bin/phpunit
+composer up
+vendor/bin/phpunit
 ```
 
 ## Collection
@@ -40,24 +40,19 @@ handling numerically indexed lists. It comes with the following methods.
 The following methods modify the list contained within the collection:
 
 * `add`
-* `addMany`
-* `addObject`
+* `addStrict`
 * `addObjects`
 * `clear`
 * `insertAt`
 * `pop`
 * `push`
-* `pushMany`
-* `pushObject`
 * `pushObjects`
 * `remove`
 * `removeAt`
-* `removeMany`
+* `removeStrict`
 * `replace`
 * `shift`
 * `unshift`
-* `unshiftMany`
-* `unshiftObject`
 * `unshiftObjects`
 
 ### Accessors
@@ -65,7 +60,6 @@ The following methods modify the list contained within the collection:
 The following methods give access to items within the collection:
 
 * `first`
-* `find`
 * `itemAt`
 * `last`
 
@@ -76,23 +70,30 @@ collection;
 
 * `any`
 * `contains`
+* `containsStrict`
 * `equals`
+* `equalsStrict`
 * `every`
 * `indexOf`
+* `indexOfStrict`
 * `isEmpty`
 * `isNotEmpty`
 * `search`
+* `searchStrict`
 
 ### Helpers
 
 The following methods assist with handling the list, and return new instances
 of the collection. (I.e. the original collection is not modified.)
 
+* `all`
 * `cast` (static)
 * `chunk`
 * `compact`
 * `copy`
 * `count`
+* `create` (static)
+* `each`
 * `filter`
 * `invoke`
 * `itemsAt`
@@ -105,6 +106,9 @@ of the collection. (I.e. the original collection is not modified.)
 * `slice`
 * `sort`
 * `sync`
-* `toArray`
+* `take`
+* `tap`
 * `unique`
+* `uniqueStrict`
 * `without`
+* `withoutStrict`

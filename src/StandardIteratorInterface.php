@@ -18,10 +18,8 @@
 
 namespace CloudCreativity\Utils\Collection;
 
-use Closure;
 use Countable;
 use IteratorAggregate;
-use OutOfBoundsException;
 
 /**
  * Interface StandardIteratorInterface
@@ -37,47 +35,64 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function all();
 
     /**
+     * Fluent clone.
+     *
+     * @return static
+     */
+    public function copy();
+
+    /**
      * @return Collection
      */
     public function collect();
 
     /**
-     * @return mixed
-     * @throws OutOfBoundsException
-     *      if the collection is empty.
+     * @param callable $callback
+     * @return $this
      */
-    public function first();
+    public function each(callable $callback);
 
     /**
-     * @return mixed
-     * @throws OutOfBoundsException
-     *      if the collection is empty.
+     * @param callable|null $callback
+     * @return mixed|null
      */
-    public function last();
+    public function first(callable $callback = null);
 
     /**
-     * @param Closure $callback
-     * @return StandardIteratorInterface
+     * @param callable|null $callback
+     * @return mixed|null
      */
-    public function filter(Closure $callback);
+    public function last(callable $callback = null);
 
     /**
-     * @param Closure $callback
-     * @return StandardIteratorInterface
+     * @param callable $callback
+     * @return static
      */
-    public function reject(Closure $callback);
+    public function filter(callable $callback);
 
     /**
-     * @param Closure $callback
+     * @param callable $callback
+     * @return static
+     */
+    public function reject(callable $callback);
+
+    /**
+     * @param callable $callback
      * @return bool
      */
-    public function every(Closure $callback);
+    public function every(callable $callback);
 
     /**
-     * @param Closure $callback
+     * @param callable $callback
      * @return bool
      */
-    public function any(Closure $callback);
+    public function any(callable $callback);
+
+    /**
+     * @param callable $callback
+     * @return Collection
+     */
+    public function map(callable $callback);
 
     /**
      * @return bool
