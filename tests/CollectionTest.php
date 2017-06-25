@@ -489,7 +489,7 @@ class CollectionTest extends TestCase
     {
         $collection = new Collection('a', 'b', 'c');
         $expected = new Collection('a', 'c', null);
-        $actual = $collection->itemsAt([0, 2, 3]);
+        $actual = $collection->itemsAt(0, 2, 3);
 
         $this->assertEquals($expected, $actual);
     }

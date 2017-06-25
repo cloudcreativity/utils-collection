@@ -613,19 +613,15 @@ class Collection implements IteratorAggregate, Countable
      * exist in the collection. The new collection will have its values in the
      * order that the indexes were requested.
      *
-     * @param array $indexes
+     * @param array ...$indexes
      * @return Collection
      *    the new collection containing only the values of the requested indexes.
      */
-    public function itemsAt(array $indexes)
+    public function itemsAt(...$indexes)
     {
-        $collection = new static();
-
-        foreach ($indexes as $index) {
-            $collection->push($this->itemAt($index));
-        }
-
-        return $collection;
+        return self::create(...$indexes)->map(function ($index) {
+            return $this->itemAt($index);
+        });
     }
 
     /**

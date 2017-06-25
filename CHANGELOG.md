@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file. This projec
 - Collection casting now longer accepts objects unless they are traversable.
 - Collection now implements `IteratorAggregate` rather than `Iterator`.
 - Collection object modifiers (e.g. `addObjects`) are now always strict.
-- Collection `replace` method now uses variable-length arguments.
+- Collection `replace` and `itemsAt` methods now use variable-length arguments.
 - Collection `chunk` method now returns a collection of collection chunks.
 - Collection methods with strict parameters have been split into two functions:
   - `add` and `addStrict`
