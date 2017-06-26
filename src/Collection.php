@@ -686,8 +686,8 @@ class Collection implements IteratorAggregate, Countable
      */
     public function pad($size, $value = null)
     {
-        $collection = new static();
-        $collection->stack = array_pad($this->stack, $size, $value);
+        $collection = clone $this;
+        $collection->stack = array_pad($collection->stack, $size, $value);
 
         return $collection;
     }
@@ -1031,12 +1031,11 @@ class Collection implements IteratorAggregate, Countable
      * @param callable|null $callback
      * @param callable|null $overflow
      * @return Collection
+     * @deprecated
      */
     public function sync($size, callable $callback = null, callable $overflow = null)
     {
-        $collection = $this
-            ->slice(0, $size)
-            ->pad($size);
+        $collection = $this->take($size)->pad($size);
 
         if ($callback) {
             $collection = $collection->map($callback);

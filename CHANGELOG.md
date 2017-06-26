@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 - New standard iterator methods `take` and `tap`.
 
+### Deprecated
+- The collection `sync` method is deprecated.
+
 ## [0.3.0] - 2017-06-25
 
 ### Added

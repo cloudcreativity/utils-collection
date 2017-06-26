@@ -561,6 +561,18 @@ class CollectionTest extends TestCase
         $this->assertSame($expected, $mapped->all());
     }
 
+    public function testPad()
+    {
+        $collection = new Collection(...$original = [1, 2, 3, 4, 5]);
+        $actual = $collection->pad(7);
+
+        $this->assertSame([1, 2, 3, 4, 5, null, null], $actual->all());
+        $this->assertNotSame($collection, $actual);
+        $this->assertSame($original, $collection->all());
+        $this->assertSame([1, 2, 3, 4, 5, 99, 99], $collection->pad(7, 99)->all(), 'pad with value');
+        $this->assertSame($original, $collection->pad(2)->all(), 'pad length shorter than collection');
+    }
+
     public function testPop()
     {
         $collection = new Collection('a', 'b');
