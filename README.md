@@ -95,6 +95,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `create` (static)
 * `each`
 * `filter`
+* `implode`
 * `invoke`
 * `itemsAt`
 * `map`

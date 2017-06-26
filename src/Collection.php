@@ -443,6 +443,17 @@ class Collection implements IteratorAggregate, Countable
     }
 
     /**
+     * Join collection elements with a string.
+     *
+     * @param string $glue
+     * @return string
+     */
+    public function implode($glue = '')
+    {
+        return implode($glue, $this->stack);
+    }
+
+    /**
      * Returns the index of the first matching item in the collection.
      *
      * This method returns the index of the first item in the collection that

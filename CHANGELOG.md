@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## Unreleased
 
 ### Added
+- New collection method `implode`.
 - New standard iterator methods `take` and `tap`.
 
 ### Deprecated

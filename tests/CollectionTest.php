@@ -390,6 +390,14 @@ class CollectionTest extends TestCase
         }));
     }
 
+    public function testImplode()
+    {
+        $collection = new Collection('a', 'b', 'c');
+
+        $this->assertSame('abc', $collection->implode());
+        $this->assertSame('a,b,c', $collection->implode(','));
+    }
+
     public function testIndexOf()
     {
         $collection = new Collection('a', 'b', 'a');
