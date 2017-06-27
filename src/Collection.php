@@ -22,6 +22,7 @@ use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use JsonSerializable;
 use OutOfBoundsException;
 use RuntimeException;
 use Traversable;
@@ -31,7 +32,7 @@ use Traversable;
  *
  * @package CloudCreativity\Utils\Collection
  */
-class Collection implements IteratorAggregate, Countable
+class Collection implements IteratorAggregate, Countable, JsonSerializable
 {
 
     /**
@@ -633,6 +634,14 @@ class Collection implements IteratorAggregate, Countable
         return self::create(...$indexes)->map(function ($index) {
             return $this->itemAt($index);
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->all();
     }
 
     /**

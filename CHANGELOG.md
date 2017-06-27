@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file. This projec
 ### Added
 - New collection method `implode`.
 - New standard iterator methods `take` and `tap`.
+- Collection can now be json encoded (implements `JsonSerializable`).
 
 ### Deprecated
 - The collection `sync` method is deprecated.

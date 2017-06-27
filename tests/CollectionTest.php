@@ -502,6 +502,14 @@ class CollectionTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
+    public function testJsonSerializable()
+    {
+        $expected = json_encode($arr = [1, 2, 3, 4, 5]);
+        $actual = json_encode(Collection::create(...$arr));
+
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
+    }
+
     public function testLast()
     {
         $collection = new Collection();
