@@ -65,6 +65,13 @@ class CollectionTest extends TestCase
         $this->assertEmpty($collection->all());
     }
 
+    public function testStringify()
+    {
+        $collection = new Collection(...$expected = [1, 2, 3, 'foo', 'bar']);
+
+        $this->assertEquals(json_encode($expected), (string) $collection);
+    }
+
     public function testAdd()
     {
         $collection = new Collection('foo');
