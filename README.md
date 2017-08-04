@@ -43,6 +43,8 @@ The following methods modify the list contained within the collection:
 * `addStrict`
 * `addObjects`
 * `clear`
+* `fill`
+* `fillObject`
 * `insertAt`
 * `pop`
 * `push`

@@ -375,6 +375,15 @@ class CollectionTest extends TestCase
         $this->assertSame($collection->all(), $actual);
     }
 
+    public function testFill()
+    {
+        $collection = Collection::create('a', 'b')->fill(1, 'c');
+
+        $this->assertSame(['a', 'b', 'c'], $collection->all());
+        $this->assertSame($expected = ['a', 'b', 'c', 'c', 'c', 'c'], $collection->fill(3, 'c')->all());
+        $this->assertSame($expected, $collection->fill(0, 'c')->all());
+    }
+
     public function testFirst()
     {
         $collection = new Collection();

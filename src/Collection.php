@@ -375,6 +375,38 @@ class Collection implements IteratorAggregate, Countable, JsonSerializable
     }
 
     /**
+     * Add a value to the end of the collection the specified number of times.
+     *
+     * @param $num
+     *      the number of elements to insert
+     * @param $value
+     *      the value to insert
+     * @return $this
+     */
+    public function fill($num, $value)
+    {
+        return $this->push(...array_fill(0, $num, $value));
+    }
+
+    /**
+     * Add a value to the end of the collection the specified number of times, if it is an object.
+     *
+     * @param $num
+     *      the number of elements to insert
+     * @param $value
+     *      the value to insert
+     * @return $this
+     */
+    public function fillObject($num, $value)
+    {
+        if (is_object($value)) {
+            $this->fill($num, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Returns a copy of the collection that contains only items for which the callback returns true.
      *
      * The callback should have the following signature:
