@@ -964,6 +964,15 @@ class CollectionTest extends TestCase
         Collection::cast((object) ['foo' => 'bar']);
     }
 
+    public function testCastStandardIterator()
+    {
+        $iterator = new DateTimeIterator(new DateTime());
+        $collection = Collection::cast($iterator);
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame($iterator->all(), $collection->all());
+    }
+
     public function testCreate()
     {
         $this->assertEquals(new Collection('a', 'b'), Collection::create('a', 'b'));

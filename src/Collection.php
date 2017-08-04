@@ -65,6 +65,8 @@ class Collection implements IteratorAggregate, Countable, JsonSerializable
     {
         if ($items instanceof static) {
             return $items;
+        } elseif ($items instanceof StandardIteratorInterface) {
+            return $items->collect();
         } elseif (is_array($items)) {
             return new self(...array_values($items));
         } elseif ($items instanceof Traversable) {
