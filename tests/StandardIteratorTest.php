@@ -189,11 +189,22 @@ class StandardIteratorTest extends TestCase
     {
         $tapped = null;
 
-        $actual = $this->iterator->tap(function (StandardIterator $tap) use (&$tapped) {
+        $this->iterator->tap(function (StandardIterator $tap) use (&$tapped) {
             $this->assertNotSame($this->iterator, $tap);
             $tapped = $tap->take(2);
         });
 
         $this->assertSame(['a', 'b'], $tapped->all());
+    }
+
+    public function testSort()
+    {
+        $actual = $this->iterator->sort(function ($a, $b) {
+            return strcmp($b, $a);
+        });
+
+        $this->assertNotSame($this->iterator, $actual);
+        $this->assertSame(['c', 'b', 'a'], $actual->all());
+        $this->assertSame(['a', 'b', 'c'], $this->iterator->all(), 'original is unaffected');
     }
 }

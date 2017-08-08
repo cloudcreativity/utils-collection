@@ -161,6 +161,18 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @param callable $callback
+     * @return static
+     */
+    public function sort(callable $callback)
+    {
+        $copy = clone $this;
+        $copy->stack = $copy->stack->sort($callback);
+
+        return $copy;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty()
