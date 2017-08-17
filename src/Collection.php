@@ -609,6 +609,17 @@ class Collection implements IteratorAggregate, Countable, JsonSerializable
     }
 
     /**
+     * Get a new collection containing only the items that are in both collections.
+     *
+     * @param $items
+     * @return Collection
+     */
+    public function intersect($items)
+    {
+        return new self(...array_intersect($this->stack, Collection::cast($items)->stack));
+    }
+
+    /**
      * Return a new collection with the result of invoking the specified method on each object in the collection.
      *
      * If this method encounters an items in the collection that are not objects,

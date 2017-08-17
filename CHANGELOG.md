@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file. This projec
 ## Unreleased
 
 ### Added
-- New collection methods `implode`, `fill`, `fillObject` and `diff`.
+- New collection methods `diff`, `fill`, `fillObject`, `implode` and `intersect`.
 - New standard iterator methods `take`, `tap` and `sort`.
 - Collection can now be json encoded (implements `JsonSerializable`).
 - Collection can now be casted to a string.

@@ -482,6 +482,16 @@ class CollectionTest extends TestCase
         $collection->insertAt(count($collection) + 1, 'foobar');
     }
 
+    public function testIntersect()
+    {
+        $collection = new Collection('a', 'b', 'c');
+        $intersect = $collection->intersect($values = ['a', 'c', 'd']);
+
+        $this->assertNotSame($collection, $intersect);
+        $this->assertSame(['a', 'c'], $intersect->all());
+        $this->assertSame(['a', 'c'], $collection->intersect(new Collection(...$values))->all());
+    }
+
     public function testInvoke()
     {
         $collection = new Collection(

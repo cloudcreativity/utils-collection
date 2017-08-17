@@ -99,6 +99,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `each`
 * `filter`
 * `implode`
+* `intersect`
 * `invoke`
 * `itemsAt`
 * `map`
