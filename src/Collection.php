@@ -305,6 +305,20 @@ class Collection implements IteratorAggregate, Countable, JsonSerializable
     }
 
     /**
+     * Get the difference between the collection and the supplied items.
+     *
+     * This method will return the values in this collection that are not
+     * present in the given items.
+     *
+     * @param $items
+     * @return Collection
+     */
+    public function diff($items)
+    {
+        return new self(...array_diff($this->stack, self::cast($items)->stack));
+    }
+
+    /**
      * @param callable $callback
      * @return $this
      */

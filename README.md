@@ -95,6 +95,7 @@ of the collection. (I.e. the original collection is not modified.)
 * `copy`
 * `count`
 * `create` (static)
+* `diff`
 * `each`
 * `filter`
 * `implode`

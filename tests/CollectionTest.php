@@ -192,6 +192,16 @@ class CollectionTest extends TestCase
         $this->assertEquals($expected, $check);
     }
 
+    public function testDiff()
+    {
+        $collection = new Collection(1, 2, 3, 4, 5);
+        $expected = new Collection(1, 3, 5);
+
+        $this->assertEquals($expected, $actual = $collection->diff($diff = [2, 4, 6, 8]));
+        $this->assertNotSame($collection, $actual);
+        $this->assertEquals($expected, $collection->diff(new Collection(...$diff)));
+    }
+
     public function testFilter()
     {
         $collection = new Collection('a', 10, 'b');
