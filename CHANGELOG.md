@@ -2,13 +2,23 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.0.0] - 2017-09-30
+
+### Added
+- New collection methods `diff`, `fill`, `fillObject`, `implode` and `intersect`.
+- New standard iterator methods `take`, `tap` and `sort`.
+- Collection can now be json encoded (implements `JsonSerializable`).
+- Collection can now be casted to a string.
+
+### Deprecated
+- The collection `sync` method is deprecated.
+
 ## [0.3.0] - 2017-06-25
 
 ### Added
 - Collection now has a static `create` method, for fluent construction.
 - Can now pass a callback to collection `first` and `last` methods.
-- New collection methods:
-  - `take`
+- New collection methods `take` and `tap`.
 - Standard iterator now has a static `create` method, for fluent construction.
 - Standard iterator now has a static `cast` method, to cast a value to an instance of the class.
 - Standard iterator interface now has the following methods: 

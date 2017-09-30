@@ -65,6 +65,13 @@ class CollectionTest extends TestCase
         $this->assertEmpty($collection->all());
     }
 
+    public function testStringify()
+    {
+        $collection = new Collection(...$expected = [1, 2, 3, 'foo', 'bar']);
+
+        $this->assertEquals(json_encode($expected), (string) $collection);
+    }
+
     public function testAdd()
     {
         $collection = new Collection('foo');
@@ -183,6 +190,16 @@ class CollectionTest extends TestCase
 
         $this->assertNotSame($collection, $check);
         $this->assertEquals($expected, $check);
+    }
+
+    public function testDiff()
+    {
+        $collection = new Collection(1, 2, 3, 4, 5);
+        $expected = new Collection(1, 3, 5);
+
+        $this->assertEquals($expected, $actual = $collection->diff($diff = [2, 4, 6, 8]));
+        $this->assertNotSame($collection, $actual);
+        $this->assertEquals($expected, $collection->diff(new Collection(...$diff)));
     }
 
     public function testFilter()
@@ -368,6 +385,15 @@ class CollectionTest extends TestCase
         $this->assertSame($collection->all(), $actual);
     }
 
+    public function testFill()
+    {
+        $collection = Collection::create('a', 'b')->fill(1, 'c');
+
+        $this->assertSame(['a', 'b', 'c'], $collection->all());
+        $this->assertSame($expected = ['a', 'b', 'c', 'c', 'c', 'c'], $collection->fill(3, 'c')->all());
+        $this->assertSame($expected, $collection->fill(0, 'c')->all());
+    }
+
     public function testFirst()
     {
         $collection = new Collection();
@@ -388,6 +414,14 @@ class CollectionTest extends TestCase
         $this->assertNull($collection->first(function ($value) {
             return 5 < $value;
         }));
+    }
+
+    public function testImplode()
+    {
+        $collection = new Collection('a', 'b', 'c');
+
+        $this->assertSame('abc', $collection->implode());
+        $this->assertSame('a,b,c', $collection->implode(','));
     }
 
     public function testIndexOf()
@@ -448,6 +482,16 @@ class CollectionTest extends TestCase
         $collection->insertAt(count($collection) + 1, 'foobar');
     }
 
+    public function testIntersect()
+    {
+        $collection = new Collection('a', 'b', 'c');
+        $intersect = $collection->intersect($values = ['a', 'c', 'd']);
+
+        $this->assertNotSame($collection, $intersect);
+        $this->assertSame(['a', 'c'], $intersect->all());
+        $this->assertSame(['a', 'c'], $collection->intersect(new Collection(...$values))->all());
+    }
+
     public function testInvoke()
     {
         $collection = new Collection(
@@ -492,6 +536,14 @@ class CollectionTest extends TestCase
         $actual = $collection->itemsAt(0, 2, 3);
 
         $this->assertEquals($expected, $actual);
+    }
+
+    public function testJsonSerializable()
+    {
+        $expected = json_encode($arr = [1, 2, 3, 4, 5]);
+        $actual = json_encode(Collection::create(...$arr));
+
+        $this->assertJsonStringEqualsJsonString($expected, $actual);
     }
 
     public function testLast()
@@ -559,6 +611,18 @@ class CollectionTest extends TestCase
         $this->assertInstanceOf(Collection::class, $mapped);
         $this->assertNotSame($collection, $mapped);
         $this->assertSame($expected, $mapped->all());
+    }
+
+    public function testPad()
+    {
+        $collection = new Collection(...$original = [1, 2, 3, 4, 5]);
+        $actual = $collection->pad(7);
+
+        $this->assertSame([1, 2, 3, 4, 5, null, null], $actual->all());
+        $this->assertNotSame($collection, $actual);
+        $this->assertSame($original, $collection->all());
+        $this->assertSame([1, 2, 3, 4, 5, 99, 99], $collection->pad(7, 99)->all(), 'pad with value');
+        $this->assertSame($original, $collection->pad(2)->all(), 'pad length shorter than collection');
     }
 
     public function testPop()
@@ -927,6 +991,15 @@ class CollectionTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
         Collection::cast((object) ['foo' => 'bar']);
+    }
+
+    public function testCastStandardIterator()
+    {
+        $iterator = new DateTimeIterator(new DateTime());
+        $collection = Collection::cast($iterator);
+
+        $this->assertInstanceOf(Collection::class, $collection);
+        $this->assertSame($iterator->all(), $collection->all());
     }
 
     public function testCreate()

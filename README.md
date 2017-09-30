@@ -43,6 +43,8 @@ The following methods modify the list contained within the collection:
 * `addStrict`
 * `addObjects`
 * `clear`
+* `fill`
+* `fillObject`
 * `insertAt`
 * `pop`
 * `push`
@@ -93,8 +95,11 @@ of the collection. (I.e. the original collection is not modified.)
 * `copy`
 * `count`
 * `create` (static)
+* `diff`
 * `each`
 * `filter`
+* `implode`
+* `intersect`
 * `invoke`
 * `itemsAt`
 * `map`

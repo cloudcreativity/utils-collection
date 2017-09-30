@@ -22,6 +22,7 @@ use ArrayIterator;
 use Countable;
 use InvalidArgumentException;
 use IteratorAggregate;
+use JsonSerializable;
 use OutOfBoundsException;
 use RuntimeException;
 use Traversable;
@@ -31,7 +32,7 @@ use Traversable;
  *
  * @package CloudCreativity\Utils\Collection
  */
-class Collection implements IteratorAggregate, Countable
+class Collection implements IteratorAggregate, Countable, JsonSerializable
 {
 
     /**
@@ -64,6 +65,8 @@ class Collection implements IteratorAggregate, Countable
     {
         if ($items instanceof static) {
             return $items;
+        } elseif ($items instanceof StandardIteratorInterface) {
+            return $items->collect();
         } elseif (is_array($items)) {
             return new self(...array_values($items));
         } elseif ($items instanceof Traversable) {
@@ -81,6 +84,14 @@ class Collection implements IteratorAggregate, Countable
     public function __construct(...$items)
     {
         $this->stack = $items;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return json_encode($this->stack);
     }
 
     /**
@@ -294,6 +305,20 @@ class Collection implements IteratorAggregate, Countable
     }
 
     /**
+     * Get the difference between the collection and the supplied items.
+     *
+     * This method will return the values in this collection that are not
+     * present in the given items.
+     *
+     * @param $items
+     * @return Collection
+     */
+    public function diff($items)
+    {
+        return new self(...array_diff($this->stack, self::cast($items)->stack));
+    }
+
+    /**
      * @param callable $callback
      * @return $this
      */
@@ -361,6 +386,38 @@ class Collection implements IteratorAggregate, Countable
         }
 
         return true;
+    }
+
+    /**
+     * Add a value to the end of the collection the specified number of times.
+     *
+     * @param $num
+     *      the number of elements to insert
+     * @param $value
+     *      the value to insert
+     * @return $this
+     */
+    public function fill($num, $value)
+    {
+        return $this->push(...array_fill(0, $num, $value));
+    }
+
+    /**
+     * Add a value to the end of the collection the specified number of times, if it is an object.
+     *
+     * @param $num
+     *      the number of elements to insert
+     * @param $value
+     *      the value to insert
+     * @return $this
+     */
+    public function fillObject($num, $value)
+    {
+        if (is_object($value)) {
+            $this->fill($num, $value);
+        }
+
+        return $this;
     }
 
     /**
@@ -440,6 +497,17 @@ class Collection implements IteratorAggregate, Countable
         }
 
         return null;
+    }
+
+    /**
+     * Join collection elements with a string.
+     *
+     * @param string $glue
+     * @return string
+     */
+    public function implode($glue = '')
+    {
+        return implode($glue, $this->stack);
     }
 
     /**
@@ -541,6 +609,17 @@ class Collection implements IteratorAggregate, Countable
     }
 
     /**
+     * Get a new collection containing only the items that are in both collections.
+     *
+     * @param $items
+     * @return Collection
+     */
+    public function intersect($items)
+    {
+        return new self(...array_intersect($this->stack, Collection::cast($items)->stack));
+    }
+
+    /**
      * Return a new collection with the result of invoking the specified method on each object in the collection.
      *
      * If this method encounters an items in the collection that are not objects,
@@ -625,6 +704,14 @@ class Collection implements IteratorAggregate, Countable
     }
 
     /**
+     * @inheritdoc
+     */
+    public function jsonSerialize()
+    {
+        return $this->all();
+    }
+
+    /**
      * Get the last item in the collection, or the last one for which the callback returns true.
      *
      * @param callable|null $callback
@@ -686,8 +773,8 @@ class Collection implements IteratorAggregate, Countable
      */
     public function pad($size, $value = null)
     {
-        $collection = new static();
-        $collection->stack = array_pad($this->stack, $size, $value);
+        $collection = clone $this;
+        $collection->stack = array_pad($collection->stack, $size, $value);
 
         return $collection;
     }
@@ -1031,12 +1118,11 @@ class Collection implements IteratorAggregate, Countable
      * @param callable|null $callback
      * @param callable|null $overflow
      * @return Collection
+     * @deprecated
      */
     public function sync($size, callable $callback = null, callable $overflow = null)
     {
-        $collection = $this
-            ->slice(0, $size)
-            ->pad($size);
+        $collection = $this->take($size)->pad($size);
 
         if ($callback) {
             $collection = $collection->map($callback);
