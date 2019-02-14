@@ -92,7 +92,7 @@ trait StandardIteratorTrait
      */
     public function filter(callable $callback)
     {
-        $filtered = new static();
+        $filtered = clone $this;
         $filtered->stack = $this->stack->filter($callback);
 
         return $filtered;
@@ -104,7 +104,7 @@ trait StandardIteratorTrait
      */
     public function reject(callable $callback)
     {
-        $filtered = new static();
+        $filtered = clone $this;
         $filtered->stack = $this->stack->reject($callback);
 
         return $filtered;

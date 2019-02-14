@@ -89,6 +89,28 @@ class StandardIteratorTest extends TestCase
         $this->assertNotSame($this->iterator, $actual);
     }
 
+    public function testFilterWithDifferentConstructorArgs()
+    {
+        // 2019-01-01 23:00:00,2019-01-02 11:00:00
+        $list = new DateTimeWithTimezoneIterator(
+            new \DateTimeZone('Australia/Melbourne'),
+            new \DateTime('2019-01-01 12:00:00'),
+            new \DateTime('2019-01-02 00:00:00')
+        );
+
+        $actual = $list->filter(function (\DateTime $date) {
+            return '2019-01-02' === $date->format('Y-m-d');
+        });
+
+        $this->assertInstanceOf(DateTimeWithTimezoneIterator::class, $actual);
+
+        $actual = $actual->map(function (\DateTime $date) {
+            return $date->format('Y-m-d H:i:s');
+        })->implode(',');
+
+        $this->assertSame('2019-01-02 11:00:00', $actual);
+    }
+
     public function testReject()
     {
         $expected = new StandardIterator('a');
@@ -99,6 +121,28 @@ class StandardIteratorTest extends TestCase
 
         $this->assertEquals($expected, $actual);
         $this->assertNotSame($this->iterator, $actual);
+    }
+
+    public function testRejectWithDifferentConstructorArgs()
+    {
+        // 2019-01-01 23:00:00,2019-01-02 11:00:00
+        $list = new DateTimeWithTimezoneIterator(
+            new \DateTimeZone('Australia/Melbourne'),
+            new \DateTime('2019-01-01 12:00:00'),
+            new \DateTime('2019-01-02 00:00:00')
+        );
+
+        $actual = $list->reject(function (\DateTime $date) {
+            return '2019-01-01' === $date->format('Y-m-d');
+        });
+
+        $this->assertInstanceOf(DateTimeWithTimezoneIterator::class, $actual);
+
+        $actual = $actual->map(function (\DateTime $date) {
+            return $date->format('Y-m-d H:i:s');
+        })->implode(',');
+
+        $this->assertSame('2019-01-02 11:00:00', $actual);
     }
 
     public function testEvery()
