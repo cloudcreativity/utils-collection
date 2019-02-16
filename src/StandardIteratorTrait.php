@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2017 Cloud Creativity Limited
+ * Copyright 2019 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -92,7 +91,7 @@ trait StandardIteratorTrait
      */
     public function filter(callable $callback)
     {
-        $filtered = new static();
+        $filtered = clone $this;
         $filtered->stack = $this->stack->filter($callback);
 
         return $filtered;
@@ -104,7 +103,7 @@ trait StandardIteratorTrait
      */
     public function reject(callable $callback)
     {
-        $filtered = new static();
+        $filtered = clone $this;
         $filtered->stack = $this->stack->reject($callback);
 
         return $filtered;
@@ -170,6 +169,16 @@ trait StandardIteratorTrait
         $copy->stack = $copy->stack->sort($callback);
 
         return $copy;
+    }
+
+    /**
+     * @param $method
+     * @param mixed ...$args
+     * @return Collection
+     */
+    public function invoke($method, ...$args)
+    {
+        return $this->stack->invoke($method, ...$args);
     }
 
     /**

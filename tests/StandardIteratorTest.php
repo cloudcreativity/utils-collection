@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2017 Cloud Creativity Limited
+ * Copyright 2019 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -89,6 +88,28 @@ class StandardIteratorTest extends TestCase
         $this->assertNotSame($this->iterator, $actual);
     }
 
+    public function testFilterWithDifferentConstructorArgs()
+    {
+        // 2019-01-01 23:00:00,2019-01-02 11:00:00
+        $list = new DateTimeWithTimezoneIterator(
+            new \DateTimeZone('Australia/Melbourne'),
+            new \DateTime('2019-01-01 12:00:00'),
+            new \DateTime('2019-01-02 00:00:00')
+        );
+
+        $actual = $list->filter(function (\DateTime $date) {
+            return '2019-01-02' === $date->format('Y-m-d');
+        });
+
+        $this->assertInstanceOf(DateTimeWithTimezoneIterator::class, $actual);
+
+        $actual = $actual->map(function (\DateTime $date) {
+            return $date->format('Y-m-d H:i:s');
+        })->implode(',');
+
+        $this->assertSame('2019-01-02 11:00:00', $actual);
+    }
+
     public function testReject()
     {
         $expected = new StandardIterator('a');
@@ -99,6 +120,28 @@ class StandardIteratorTest extends TestCase
 
         $this->assertEquals($expected, $actual);
         $this->assertNotSame($this->iterator, $actual);
+    }
+
+    public function testRejectWithDifferentConstructorArgs()
+    {
+        // 2019-01-01 23:00:00,2019-01-02 11:00:00
+        $list = new DateTimeWithTimezoneIterator(
+            new \DateTimeZone('Australia/Melbourne'),
+            new \DateTime('2019-01-01 12:00:00'),
+            new \DateTime('2019-01-02 00:00:00')
+        );
+
+        $actual = $list->reject(function (\DateTime $date) {
+            return '2019-01-01' === $date->format('Y-m-d');
+        });
+
+        $this->assertInstanceOf(DateTimeWithTimezoneIterator::class, $actual);
+
+        $actual = $actual->map(function (\DateTime $date) {
+            return $date->format('Y-m-d H:i:s');
+        })->implode(',');
+
+        $this->assertSame('2019-01-02 11:00:00', $actual);
     }
 
     public function testEvery()
@@ -206,5 +249,18 @@ class StandardIteratorTest extends TestCase
         $this->assertNotSame($this->iterator, $actual);
         $this->assertSame(['c', 'b', 'a'], $actual->all());
         $this->assertSame(['a', 'b', 'c'], $this->iterator->all(), 'original is unaffected');
+    }
+
+    public function testInvoke()
+    {
+        $dates = new DateTimeIterator(
+            new DateTime('2018-01-01 12:00:00'),
+            new DateTime('2018-01-02 14:00:00')
+        );
+
+        $actual = $dates->invoke('format', 'Y-m-d');
+
+        $this->assertInstanceOf(Collection::class, $actual);
+        $this->assertEquals(['2018-01-01', '2018-01-02'], $actual->all());
     }
 }

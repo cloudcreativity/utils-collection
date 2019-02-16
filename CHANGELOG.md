@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file. This project adheres to
 [Semantic Versioning](http://semver.org/) and [this changelog format](http://keepachangelog.com/).
 
+## [1.1.0] - 2019-02-16
+
+### Added
+- Added `invoke` method to standard iterator trait.
+
+### Fixed
+- Use `clone` rather than `new` in standard iterator trait's `reject` and `filter` methods. This allows
+an implementing class to have different constructor arguments.
+
 ## [1.0.0] - 2017-09-30
 
 ### Added

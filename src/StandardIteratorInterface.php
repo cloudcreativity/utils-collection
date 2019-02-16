@@ -1,7 +1,6 @@
 <?php
-
 /**
- * Copyright 2017 Cloud Creativity Limited
+ * Copyright 2019 Cloud Creativity Limited
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,6 +110,15 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
      * @return static
      */
     public function sort(callable $callback);
+
+    /**
+     * @param $method
+     * @param mixed ...$args
+     * @return Collection
+     * @todo add for 2.0
+     *
+    public function invoke($method, ...$args);
+     */
 
     /**
      * @return bool

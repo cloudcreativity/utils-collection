@@ -17,34 +17,31 @@
 
 namespace CloudCreativity\Utils\Collection\Tests;
 
-use CloudCreativity\Utils\Collection\Collection;
 use CloudCreativity\Utils\Collection\StandardIterator;
-use DateTime;
 
-/**
- * Class DateTimeIterator
- *
- * @package CloudCreativity\Utils\Collection
- */
-class DateTimeIterator extends StandardIterator
+class DateTimeWithTimezoneIterator extends StandardIterator
 {
 
     /**
-     * DateTimeIterator constructor.
-     *
-     * @param DateTime[] ...$items
+     * @var \DateTimeZone
      */
-    public function __construct(DateTime ...$items)
-    {
-        parent::__construct(...$items);
-    }
+    private $tz;
 
     /**
-     * @param $format
-     * @return Collection
+     * DateTimeWithTimezoneIterator constructor.
+     *
+     * @param \DateTimeZone $tz
+     * @param \DateTime ...$dates
      */
-    public function format($format)
+    public function __construct(\DateTimeZone $tz, \DateTime ...$dates)
     {
-        return $this->stack->invoke('format', $format);
+        parent::__construct(...$dates);
+        $this->tz = $tz;
+        $this->stack = $this->stack->map(function (\DateTime $date) use ($tz) {
+            $date = clone $date;
+            $date->setTimezone($tz);
+            return $date;
+        });
     }
+
 }
