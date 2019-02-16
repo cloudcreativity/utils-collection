@@ -173,6 +173,16 @@ trait StandardIteratorTrait
     }
 
     /**
+     * @param $method
+     * @param mixed ...$args
+     * @return Collection
+     */
+    public function invoke($method, ...$args)
+    {
+        return $this->stack->invoke($method, ...$args);
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty()

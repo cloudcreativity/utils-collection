@@ -251,4 +251,17 @@ class StandardIteratorTest extends TestCase
         $this->assertSame(['c', 'b', 'a'], $actual->all());
         $this->assertSame(['a', 'b', 'c'], $this->iterator->all(), 'original is unaffected');
     }
+
+    public function testInvoke()
+    {
+        $dates = new DateTimeIterator(
+            new DateTime('2018-01-01 12:00:00'),
+            new DateTime('2018-01-02 14:00:00')
+        );
+
+        $actual = $dates->invoke('format', 'Y-m-d');
+
+        $this->assertInstanceOf(Collection::class, $actual);
+        $this->assertEquals(['2018-01-01', '2018-01-02'], $actual->all());
+    }
 }

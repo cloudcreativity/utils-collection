@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file. This projec
 
 ## Unreleased
 
+### Added
+- Added `invoke` method to standard iterator trait.
+
 ### Fixed
 - Use `clone` rather than `new` in standard iterator trait's `reject` and `filter` methods. This allows
 an implementing class to have different constructor arguments.

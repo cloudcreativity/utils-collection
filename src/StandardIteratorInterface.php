@@ -113,6 +113,15 @@ interface StandardIteratorInterface extends IteratorAggregate, Countable
     public function sort(callable $callback);
 
     /**
+     * @param $method
+     * @param mixed ...$args
+     * @return Collection
+     * @todo add for 2.0
+     *
+    public function invoke($method, ...$args);
+     */
+
+    /**
      * @return bool
      */
     public function isEmpty();
